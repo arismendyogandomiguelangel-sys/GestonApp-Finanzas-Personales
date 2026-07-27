@@ -97,8 +97,9 @@ export default async function RootLayout(props: Readonly<{ children: React.React
       numberFormat = userSettings.numberFormat;
       dateFormat = userSettings.dateFormat;
     } catch (err) {
-      unstable_rethrow(err);
-      console.error("Layout DB unavailable, using defaults: %s", err instanceof Error ? err.message : String(err));
+      if (err && typeof err === "object" && "digest" in err && String((err as { digest?: string }).digest).startsWith("NEXT_REDIRECT")) {
+        throw err;
+      }
       locale = await getLocaleCookie();
     }
   }

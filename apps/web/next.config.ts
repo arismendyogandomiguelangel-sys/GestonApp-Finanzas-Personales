@@ -1,16 +1,33 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  serverExternalPackages: [
+    "@opentelemetry/sdk-node",
+    "@opentelemetry/exporter-trace-otlp-grpc",
+    "@opentelemetry/otlp-grpc-exporter-base",
+    "@grpc/grpc-js",
+    "pg",
+  ],
   turbopack: {
     root: process.cwd(),
   },
   experimental: {
-    // Default is 10 MB. The /api/chat route sends base64-encoded images in the
-    // JSON body — 5 screenshots easily exceed 10 MB. Set to 100 MB to match
-    // the upstream Cloudflare free-plan limit.
     proxyClientMaxBodySize: "100mb",
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        stream: false,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+        crypto: false,
+      };
+    }
+    return config;
   },
 };
 

@@ -12,11 +12,9 @@
  *
  * Throws with all collected errors on misconfiguration. Skipped in dev.
  */
-import { NodeSDK } from "@opentelemetry/sdk-node";
 import { getAuthModeValidationErrors } from "@/server/authMode";
 import { createLangfuseSpanProcessor } from "@/server/chat/openai/langfuse";
 
-let telemetrySdk: NodeSDK | null = null;
 let telemetryStarted = false;
 
 const validateLangfuseConfig = (): ReadonlyArray<string> => {
@@ -36,7 +34,7 @@ const validateLangfuseConfig = (): ReadonlyArray<string> => {
   ];
 };
 
-const startTelemetryIfConfigured = (): void => {
+const startTelemetryIfConfigured = async (): Promise<void> => {
   if (telemetryStarted) {
     return;
   }
@@ -46,11 +44,16 @@ const startTelemetryIfConfigured = (): void => {
     return;
   }
 
-  telemetrySdk = new NodeSDK({
-    spanProcessors: [spanProcessor],
-  });
-  void telemetrySdk.start();
-  telemetryStarted = true;
+  try {
+    const { NodeSDK } = await import("@opentelemetry/sdk-node");
+    const telemetrySdk = new NodeSDK({
+      spanProcessors: [spanProcessor],
+    });
+    void telemetrySdk.start();
+    telemetryStarted = true;
+  } catch (err) {
+    console.error("Failed to initialize OpenTelemetry SDK: %s", err instanceof Error ? err.message : String(err));
+  }
 };
 
 export const register = (): void => {

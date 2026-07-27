@@ -1,0 +1,43 @@
+{
+  "name": "@expense-budget-tracker/agent-shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./discovery": {
+      "types": "./dist/discovery.d.ts",
+      "import": "./dist/discovery.js",
+      "default": "./dist/discovery.js"
+    },
+    "./sql-policy": {
+      "types": "./dist/sql-policy.d.ts",
+      "import": "./dist/sql-policy.js",
+      "default": "./dist/sql-policy.js"
+    },
+    "./crockford": {
+      "types": "./dist/crockford.d.ts",
+      "import": "./dist/crockford.js",
+      "default": "./dist/crockford.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "tsx": "^4.23.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

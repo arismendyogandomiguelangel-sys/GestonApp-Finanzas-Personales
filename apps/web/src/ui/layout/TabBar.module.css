@@ -1,0 +1,39 @@
+.tabBarContainer {
+  background-color: var(--bg-surface, #1e293b);
+  border-block-end: 1px solid var(--border-color, #334155);
+  padding-inline-start: 24px;
+  padding-inline-end: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabBarContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.tabItem {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 12px;
+  padding-inline: 16px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-block-end: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.tabItem:hover {
+  color: #f1f5f9;
+}
+
+.tabItemActive {
+  color: #818cf8;
+  font-weight: 600;
+  border-block-end-color: #6366f1;
+}

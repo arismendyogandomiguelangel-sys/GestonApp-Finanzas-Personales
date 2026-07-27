@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build output
+.next/
+dist/
+cdk.out/
+*.tsbuildinfo
+
+# Lock files (npm only — package-lock.json is tracked)
+yarn.lock
+
+# Environment
+**/.env
+**/.env.local
+
+# CDK local/cached context (account-specific, auto-generated)
+cdk.context.local.json
+cdk.context.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Local artifacts
+tmp/
+
+# Playwright
+apps/web/playwright-report/
+apps/web/test-results/
+
+# Claude Code local state (per-developer)
+.claude/settings.local.json
+.claude/worktrees/

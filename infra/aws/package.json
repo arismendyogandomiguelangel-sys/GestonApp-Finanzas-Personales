@@ -1,0 +1,32 @@
+{
+  "name": "expense-budget-tracker-aws",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "npm --prefix ../.. run build --workspace @expense-budget-tracker/agent-shared",
+    "presynth": "npm --prefix ../.. run build --workspace @expense-budget-tracker/agent-shared",
+    "predeploy": "npm --prefix ../.. run build --workspace @expense-budget-tracker/agent-shared",
+    "prediff": "npm --prefix ../.. run build --workspace @expense-budget-tracker/agent-shared",
+    "build": "tsc",
+    "cdk": "cdk",
+    "deploy": "cdk deploy --all",
+    "destroy": "cdk destroy --all",
+    "diff": "cdk diff",
+    "synth": "cdk synth"
+  },
+  "dependencies": {
+    "@aws-crypto/client-node": "^5.0.0",
+    "@aws-sdk/client-secrets-manager": "^3.1087.0",
+    "aws-cdk-lib": "^2.261.0",
+    "constructs": "^10.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "aws-cdk": "^2.1131.0",
+    "esbuild": "^0.28.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

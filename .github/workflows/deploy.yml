@@ -1,0 +1,275 @@
+# CI/CD — triggered on push to main.
+#
+# Uses the same `cdk deploy` as the bootstrap script.
+# CDK builds Docker images (via fromAsset), pushes them to the bootstrap ECR,
+# and updates all infrastructure. /api/live is used only for infra health checks.
+# Migrations run as a one-off ECS task after deploy, then /api/health confirms DB readiness.
+# Exchange rates are refreshed by invoking the FX fetcher Lambda.
+#
+# Requires bootstrap (scripts/bootstrap.sh) to have been run first.
+# See docs/deployment.md for details.
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'api/openapi.yaml'
+      - 'db/migrations/**'
+      - 'db/views/**'
+      - 'infra/**'
+      - 'scripts/migrate.sh'
+      - 'scripts/run-migration-task.sh'
+      - 'scripts/check-web-readiness.sh'
+      - 'scripts/live-agent-api-smoke.mjs'
+      - '.npmrc'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aws
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  STACK_NAME: ExpenseBudgetTracker
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      domain_name: ${{ vars.CDK_DOMAIN_NAME }}
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - name: Detect changed paths
+        id: changes
+        if: github.event_name == 'push'
+        uses: dorny/paths-filter@v4.0.2
+        with:
+          filters: |
+            migrations:
+              - 'db/migrations/**'
+              - 'db/views/**'
+              - 'scripts/migrate.sh'
+              - 'scripts/run-migration-task.sh'
+              - 'scripts/check-web-readiness.sh'
+            worker:
+              - 'apps/worker/**'
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Set up npm
+        run: npm install --global "$(node -p "require('./package.json').packageManager")"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6.2.2
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Install root workspace deps so CDK, Lambda bundling, and shared packages
+      # all resolve from the canonical root lockfile.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build shared package
+        run: npm --workspace @expense-budget-tracker/agent-shared run build
+
+      # Refresh Cloudflare edge IP ranges so the ALB security group stays current.
+      # Best-effort: if the API is unreachable, the committed cloudflare-ips.json is used.
+      - name: Update Cloudflare IPs
+        id: cloudflare
+        continue-on-error: true
+        run: bash scripts/update-cloudflare-ips.sh
+
+      - name: Warn on stale Cloudflare IPs
+        if: steps.cloudflare.outcome == 'failure'
+        run: echo "::warning::Cloudflare IP update failed — ALB security group uses committed cloudflare-ips.json which may be stale"
+
+      # CDK builds Docker images (fromAsset), pushes to bootstrap ECR,
+      # and updates all infrastructure in one pass.
+      - name: CDK deploy
+        working-directory: infra/aws
+        run: |
+          cat > cdk.context.local.json <<CTXEOF
+          {
+            "region": "${{ vars.AWS_REGION }}",
+            "domainName": "${{ vars.CDK_DOMAIN_NAME }}",
+            "certificateArn": "${{ secrets.CDK_CERTIFICATE_ARN }}",
+            "apiCertificateArn": "${{ secrets.CDK_API_CERTIFICATE_ARN }}",
+            "resendApiKeySecretArn": "${{ vars.CDK_RESEND_API_KEY_SECRET_ARN }}",
+            "resendSenderEmail": "${{ vars.CDK_RESEND_SENDER_EMAIL }}",
+            "langfuseBaseUrl": "${{ vars.CDK_LANGFUSE_BASE_URL }}",
+            "alertEmail": "${{ vars.CDK_ALERT_EMAIL }}",
+            "githubRepo": "${{ vars.CDK_GITHUB_REPO }}",
+            "demoEmailDostip": "${{ vars.CDK_DEMO_EMAIL_DOSTIP }}"
+          }
+          CTXEOF
+          npx cdk deploy --all --require-approval never
+
+      - name: Read stack outputs
+        id: outputs
+        run: |
+          get_output() {
+            aws cloudformation describe-stacks \
+              --stack-name ${{ env.STACK_NAME }} \
+              --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" \
+              --output text
+          }
+          echo "cluster=$(get_output EcsClusterName)" >> "$GITHUB_OUTPUT"
+          echo "service=$(get_output EcsServiceName)" >> "$GITHUB_OUTPUT"
+          echo "migrate_task=$(get_output MigrateTaskDefArn)" >> "$GITHUB_OUTPUT"
+          echo "migrate_sg=$(get_output MigrateSecurityGroupId)" >> "$GITHUB_OUTPUT"
+          echo "alb_dns=$(get_output AlbDns)" >> "$GITHUB_OUTPUT"
+          echo "fx_function=$(get_output FxFetcherFunctionName)" >> "$GITHUB_OUTPUT"
+
+      # Run database migrations as a one-off ECS task after every deploy.
+      # The script is idempotent, and always running it avoids schema drift when
+      # a commit that introduced a migration fails before this step, but a later
+      # commit still deploys code that depends on that schema change.
+      - name: Run migrations
+        run: bash scripts/run-migration-task.sh
+        env:
+          CLUSTER: ${{ steps.outputs.outputs.cluster }}
+          SERVICE: ${{ steps.outputs.outputs.service }}
+          MIGRATE_TASK: ${{ steps.outputs.outputs.migrate_task }}
+          MIGRATE_SG: ${{ steps.outputs.outputs.migrate_sg }}
+
+      - name: Confirm web readiness
+        run: bash scripts/check-web-readiness.sh
+        env:
+          ALB_DNS: ${{ steps.outputs.outputs.alb_dns }}
+
+      # Ensure exchange rates are up to date (idempotent — ON CONFLICT DO NOTHING)
+      - name: Seed exchange rates
+        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.worker == 'true'
+        continue-on-error: true
+        run: bash scripts/invoke-fx-fetcher.sh
+        env:
+          FX_FUNCTION: ${{ steps.outputs.outputs.fx_function }}
+
+  # Post-deploy smoke test: Playwright happy-path against the live app.
+  # Fix-forward: a failed smoke does not rollback the deployment.
+  web_smoke:
+    needs: deploy
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Set up npm
+        run: npm install --global "$(node -p "require('./package.json').packageManager")"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+
+      - name: Wait for services to be healthy
+        run: |
+          for endpoint in "https://auth.${{ vars.CDK_DOMAIN_NAME }}/health" "https://app.${{ vars.CDK_DOMAIN_NAME }}/api/health"; do
+            echo "Waiting for $endpoint ..."
+            for i in $(seq 1 30); do
+              if curl -sf --max-time 5 "$endpoint" > /dev/null 2>&1; then
+                echo "  OK after attempt $i"
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "  FAILED: $endpoint not healthy after 30 attempts"
+                exit 1
+              fi
+              sleep 5
+            done
+          done
+
+      - name: Run live smoke tests
+        working-directory: apps/web
+        run: npx playwright test
+        env:
+          EXPENSE_E2E_APP_BASE_URL: https://app.${{ vars.CDK_DOMAIN_NAME }}
+          EXPENSE_E2E_AUTH_BASE_URL: https://auth.${{ vars.CDK_DOMAIN_NAME }}
+          EXPENSE_E2E_REVIEW_EMAIL: e2e-test@example.com
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: test-results
+          path: apps/web/test-results/
+          retention-days: 14
+
+  agent_api_smoke:
+    needs: deploy
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.0
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Wait for auth and API to be healthy
+        run: |
+          for endpoint in "https://auth.${{ vars.CDK_DOMAIN_NAME }}/health" "https://api.${{ vars.CDK_DOMAIN_NAME }}/v1/"; do
+            echo "Waiting for $endpoint ..."
+            for i in $(seq 1 30); do
+              if curl -sf --max-time 5 "$endpoint" > /dev/null 2>&1; then
+                echo "  OK after attempt $i"
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "  FAILED: $endpoint not healthy after 30 attempts"
+                exit 1
+              fi
+              sleep 5
+            done
+          done
+
+      - name: Run live agent API smoke
+        run: |
+          mkdir -p artifacts
+          node scripts/live-agent-api-smoke.mjs 2>&1 | tee artifacts/agent-api-smoke.log
+        env:
+          EXPENSE_AGENT_SMOKE_APP_BASE_URL: https://app.${{ vars.CDK_DOMAIN_NAME }}
+          EXPENSE_AGENT_SMOKE_AUTH_BASE_URL: https://auth.${{ vars.CDK_DOMAIN_NAME }}
+          EXPENSE_AGENT_SMOKE_API_BASE_URL: https://api.${{ vars.CDK_DOMAIN_NAME }}/v1
+          EXPENSE_AGENT_SMOKE_REVIEW_EMAIL: e2e-test@example.com
+
+      - name: Upload agent API smoke log
+        if: failure()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: agent-api-smoke-log
+          path: artifacts/agent-api-smoke.log
+          retention-days: 14

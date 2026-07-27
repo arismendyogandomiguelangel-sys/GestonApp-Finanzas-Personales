@@ -1,0 +1,305 @@
+.scroll {
+  overflow-x: auto;
+  padding-inline-end: 16px;
+  margin-bottom: 24px;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+  min-width: 100%;
+}
+
+.headCell {
+  padding: 6px 10px;
+  text-align: start;
+  font-weight: 650;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.headCellRight {
+  text-align: end;
+}
+
+.headCellSortable {
+  cursor: var(--cursor-pointer);
+  user-select: none;
+}
+
+.headCellSortable:hover {
+  color: var(--muted);
+}
+
+.row:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.rowTotal {
+  border-top: 1px solid var(--panel-border);
+}
+
+.cell {
+  --table-cell-padding-inline: 10px;
+
+  padding-block: 4px;
+  padding-inline: var(--table-cell-padding-inline);
+  font-variant-numeric: tabular-nums;
+}
+
+.cellSingleLinePreview {
+  display: block;
+  inline-size: var(--cell-single-line-preview-inline-size, 100%);
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellRight {
+  text-align: end;
+  min-width: 90px;
+}
+
+.cellBold {
+  font-weight: 650;
+}
+
+.cellMono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.scrollSentinel {
+  min-height: 1px;
+  padding: 8px 0;
+}
+
+.editable {
+  cursor: var(--cursor-pointer);
+}
+
+.editable:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editableSelect::after {
+  content: " \25BE";
+  color: var(--muted);
+  font-size: 10px;
+  opacity: 0;
+}
+
+.editableSelect:hover::after {
+  opacity: 1;
+}
+
+.input {
+  font-family: inherit;
+  font-size: inherit;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--panel-border);
+  padding: 1px 4px;
+  width: 100%;
+  outline: none;
+}
+
+.editorOverlay {
+  position: fixed;
+  z-index: 200;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-family: inherit;
+  white-space: nowrap;
+  background: var(--bg);
+  color: var(--text);
+  border: none;
+  outline: none;
+  box-shadow: 0 0 0 1px var(--panel-border), 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+
+.selectOverlay {
+  position: fixed;
+  z-index: 200;
+  min-width: 160px;
+  max-height: 260px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--panel-border), 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.selectSearch {
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.selectOptions {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.selectOption {
+  display: block;
+  width: 100%;
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: var(--cursor-pointer);
+  white-space: nowrap;
+}
+
+.selectOption:hover,
+.selectOptionHighlight {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.selectOptionActive {
+  font-weight: 650;
+}
+
+.textareaOverlay {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 0 0 1px var(--panel-border), 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.textareaEditor {
+  display: block;
+  width: 100%;
+  min-height: calc(3 * 1.4em + 12px);
+  max-height: 220px;
+  padding: 6px 10px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.textareaHints {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 160px;
+  padding: 4px 0;
+}
+
+.textareaHint {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: var(--cursor-pointer);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.textareaHint:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.textareaHintActive {
+  font-weight: 650;
+}
+
+.filterPopover {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--panel-border), 0 4px 12px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.filterPopoverSearch {
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.filterPopoverOptions {
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.filterPopoverOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  cursor: var(--cursor-pointer);
+}
+
+.filterPopoverOption:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.filterPopoverOption input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.filterPopoverOptionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filterPopoverEmpty {
+  padding: 8px 10px;
+  color: var(--muted);
+}

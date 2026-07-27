@@ -1,0 +1,330 @@
+.filterCount {
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.transactionsFiltersTrigger {
+  min-width: 160px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: var(--cursor-pointer);
+  text-align: start;
+}
+
+.transactionsFiltersTriggerBadge {
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 11px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.addRowButton {
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: var(--cursor-pointer);
+}
+
+.addRowButton:hover {
+  border-color: var(--text);
+}
+
+.cellNote {
+  --transaction-note-inline-size: clamp(360px, 40vw, 680px);
+  --cell-single-line-preview-inline-size: calc(
+    var(--transaction-note-inline-size) -
+    var(--table-cell-padding-inline) -
+    var(--table-cell-padding-inline)
+  );
+
+  inline-size: var(--transaction-note-inline-size);
+  min-inline-size: var(--transaction-note-inline-size);
+  max-inline-size: var(--transaction-note-inline-size);
+}
+
+.cellCopy {
+  inline-size: 28px;
+  min-inline-size: 28px;
+  padding-inline: 2px;
+  text-align: center;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 3px;
+  border: none;
+  border-radius: 3px;
+  background: none;
+  color: var(--muted);
+  cursor: var(--cursor-pointer);
+  opacity: 0;
+}
+
+:global(tr:hover) .copyButton,
+.copyButton:focus-visible {
+  opacity: 1;
+}
+
+.copyButton:hover {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.copyButton:focus-visible {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.06);
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+.copyIcon {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+.copyFeedback {
+  position: fixed;
+  z-index: 300;
+  inset-inline-end: 20px;
+  inset-block-end: 20px;
+  max-inline-size: min(320px, calc(100vw - 40px));
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.copyFeedback:empty {
+  display: none;
+}
+
+.copyFeedbackError {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+.cellDelete {
+  width: 24px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--muted);
+  cursor: var(--cursor-pointer);
+  opacity: 0;
+  line-height: 1;
+}
+
+:global(tr:hover) .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton:hover {
+  color: #c0392b;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .copyButton {
+    opacity: 1;
+  }
+}
+
+.transactionsFiltersOverlay {
+  z-index: 210;
+  border: 1px solid var(--panel-border);
+  overflow: hidden;
+}
+
+.transactionsFiltersOverlayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.transactionsFiltersOverlayTitle {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.transactionsFiltersOverlayActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transactionsFiltersOverlayAction {
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: var(--cursor-pointer);
+}
+
+.transactionsFiltersOverlayAction:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.transactionsFiltersOverlayAction:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.transactionsFiltersOverlayBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.transactionsFiltersOverlaySection {}
+
+.transactionsFiltersRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: var(--cursor-pointer);
+}
+
+.transactionsFiltersRow:hover,
+.transactionsFiltersRowOpen {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--text);
+}
+
+.transactionsFiltersRowTitle {
+  min-width: 0;
+  font-weight: 650;
+}
+
+.transactionsFiltersRowSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.transactionsFiltersRowSummaryText {
+  color: var(--muted);
+}
+
+.transactionsFiltersRowBadge {
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.transactionsFiltersRowCaret {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.transactionsFiltersPicker {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+}
+
+.transactionsFiltersPickerTitle {
+  padding: 10px 12px 0;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.transactionsFiltersPickerSearch {
+  width: calc(100% - 24px);
+  margin: 10px 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.transactionsFiltersPickerOptions {
+  overflow-y: auto;
+  padding: 0 0 8px;
+}
+
+.transactionsFiltersPickerOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  cursor: var(--cursor-pointer);
+}
+
+.transactionsFiltersPickerOption:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.transactionsFiltersPickerOption input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.transactionsFiltersPickerOptionLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .transactionsFiltersOverlayBody {
+    padding: 10px;
+  }
+}

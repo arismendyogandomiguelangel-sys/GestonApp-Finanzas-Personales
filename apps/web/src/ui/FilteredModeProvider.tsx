@@ -1,0 +1,153 @@
+"use client";
+
+import { createContext, useContext, useEffect, useState, type ReactElement, type ReactNode } from "react";
+
+type VisibilityMode = "all" | "filtered";
+
+type FilteredModeContextValue = Readonly<{
+  visibilityMode: VisibilityMode;
+  setVisibilityMode: (mode: VisibilityMode) => void;
+  allowedCategories: ReadonlySet<string>;
+  effectiveAllowlist: ReadonlySet<string> | null;
+  allCategories: ReadonlyArray<string>;
+  categoriesLoading: boolean;
+}>;
+
+const STORAGE_MODE_KEY = "expense-tracker-visibility-mode";
+const STORAGE_LAST_ACTIVE_KEY = "expense-tracker-last-active-ts";
+
+const FilteredModeContext = createContext<FilteredModeContextValue | null>(null);
+
+type ProviderProps = Readonly<{
+  isDemoMode: boolean;
+  children: ReactNode;
+}>;
+
+export const FilteredModeProvider = (props: ProviderProps): ReactElement => {
+  const { isDemoMode, children } = props;
+
+  const [visibilityMode, setVisibilityModeState] = useState<VisibilityMode>(
+    isDemoMode ? "all" : "filtered",
+  );
+
+  // Restore saved mode from localStorage after hydration
+  useEffect(() => {
+    if (isDemoMode) return;
+    const savedMode = localStorage.getItem(STORAGE_MODE_KEY) as VisibilityMode | null;
+    const lastActiveStr = localStorage.getItem(STORAGE_LAST_ACTIVE_KEY);
+    if (savedMode === null || lastActiveStr === null) return;
+    const elapsed = Date.now() - Number(lastActiveStr);
+    const TWO_MINUTES_MS = 2 * 60 * 1000;
+    if (elapsed >= TWO_MINUTES_MS) return;
+    setVisibilityModeState(savedMode);
+  }, [isDemoMode]);
+
+  const [allowedCategories, setAllowedCategories] = useState<ReadonlySet<string>>(new Set());
+  const [allCategories, setAllCategories] = useState<ReadonlyArray<string>>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Categories API: ${res.status}`);
+        return res.json() as Promise<{ categories: ReadonlyArray<string> }>;
+      })
+      .then((data) => setAllCategories(data.categories))
+      .catch((err: unknown) => console.error("Failed to fetch categories:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/workspace-settings")
+      .then((res) => {
+        if (!res.ok) throw new Error(`Workspace settings API: ${res.status}`);
+        return res.json() as Promise<{ filteredCategories: ReadonlyArray<string> | null }>;
+      })
+      .then((data) => {
+        if (data.filteredCategories !== null) {
+          setAllowedCategories(new Set(data.filteredCategories));
+        }
+      })
+      .catch((err: unknown) => console.error("Failed to fetch filtered categories:", err))
+      .finally(() => setCategoriesLoading(false));
+  }, []);
+
+  const setVisibilityMode = (mode: VisibilityMode): void => {
+    setVisibilityModeState(mode);
+  };
+
+  useEffect(() => {
+    if (isDemoMode) return;
+    localStorage.setItem(STORAGE_MODE_KEY, visibilityMode);
+  }, [visibilityMode, isDemoMode]);
+
+  // Auto-switch to filtered: on tab hide and after 2 min inactivity
+  useEffect(() => {
+    if (isDemoMode) return;
+
+    const switchToFiltered = (): void => setVisibilityModeState("filtered");
+
+    const INACTIVITY_MS = 2 * 60 * 1000;
+    let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const resetInactivityTimer = (): void => {
+      if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(switchToFiltered, INACTIVITY_MS);
+      localStorage.setItem(STORAGE_LAST_ACTIVE_KEY, String(Date.now()));
+    };
+
+    const handleVisibilityChange = (): void => {
+      if (document.hidden) {
+        localStorage.setItem(STORAGE_LAST_ACTIVE_KEY, String(Date.now()));
+      } else {
+        const lastActiveStr = localStorage.getItem(STORAGE_LAST_ACTIVE_KEY);
+        if (lastActiveStr !== null) {
+          const elapsed = Date.now() - Number(lastActiveStr);
+          if (elapsed >= INACTIVITY_MS) {
+            switchToFiltered();
+          }
+        }
+        resetInactivityTimer();
+      }
+    };
+
+    const ACTIVITY_EVENTS = ["mousedown", "keydown", "touchstart", "scroll"] as const;
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    ACTIVITY_EVENTS.forEach((evt) =>
+      document.addEventListener(evt, resetInactivityTimer, { passive: true }),
+    );
+    resetInactivityTimer();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      ACTIVITY_EVENTS.forEach((evt) => document.removeEventListener(evt, resetInactivityTimer));
+      if (inactivityTimer !== null) clearTimeout(inactivityTimer);
+    };
+  }, [isDemoMode]);
+
+  const effectiveAllowlist: ReadonlySet<string> | null =
+    !isDemoMode && visibilityMode === "filtered" ? allowedCategories : null;
+
+  const value: FilteredModeContextValue = {
+    visibilityMode: isDemoMode ? "all" : visibilityMode,
+    setVisibilityMode,
+    allowedCategories,
+    effectiveAllowlist,
+    allCategories,
+    categoriesLoading,
+  };
+
+  return (
+    <FilteredModeContext.Provider value={value}>
+      {children}
+    </FilteredModeContext.Provider>
+  );
+};
+
+export const useFilteredMode = (): FilteredModeContextValue => {
+  const ctx = useContext(FilteredModeContext);
+  if (ctx === null) {
+    throw new Error("useFilteredMode must be used within a FilteredModeProvider");
+  }
+  return ctx;
+};

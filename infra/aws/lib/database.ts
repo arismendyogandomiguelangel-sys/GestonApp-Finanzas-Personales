@@ -1,0 +1,96 @@
+import * as cdk from "aws-cdk-lib";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as rds from "aws-cdk-lib/aws-rds";
+import { Construct } from "constructs";
+
+export interface DatabaseProps {
+  vpc: ec2.Vpc;
+  dbSg: ec2.SecurityGroup;
+}
+
+export interface DatabaseResult {
+  db: rds.DatabaseInstance;
+  appDbSecret: cdk.aws_secretsmanager.Secret;
+  authDbSecret: cdk.aws_secretsmanager.Secret;
+  workerDbSecret: cdk.aws_secretsmanager.Secret;
+}
+
+const POSTGRES_ENGINE_VERSION = rds.PostgresEngineVersion.of("18.4", "18", {
+  s3Import: true,
+  s3Export: true,
+});
+
+export function database(scope: Construct, props: DatabaseProps): DatabaseResult {
+  // --- RDS Postgres ---
+  const dbCredentials = rds.Credentials.fromGeneratedSecret("tracker", {
+    secretName: "expense-tracker/db-credentials",
+    excludeCharacters: " %+~`#$&*()|[]{}:;<>?!/@\"\\",
+  });
+
+  // Audit connections and enforce SSL.
+  // Note: rds.force_ssl requires RDS reboot on first apply (~1-2 min downtime).
+  const parameterGroup = new rds.ParameterGroup(scope, "DbParams", {
+    engine: rds.DatabaseInstanceEngine.postgres({
+      version: POSTGRES_ENGINE_VERSION,
+    }),
+    parameters: {
+      "log_connections": "all",
+      "log_disconnections": "1",
+      "rds.force_ssl": "1",
+    },
+  });
+
+  const db = new rds.DatabaseInstance(scope, "Db", {
+    engine: rds.DatabaseInstanceEngine.postgres({
+      version: POSTGRES_ENGINE_VERSION,
+    }),
+    instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
+    vpc: props.vpc,
+    vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+    securityGroups: [props.dbSg],
+    credentials: dbCredentials,
+    databaseName: "tracker",
+    parameterGroup,
+    allocatedStorage: 20,
+    maxAllocatedStorage: 50,
+    storageEncrypted: true,
+    backupRetention: cdk.Duration.days(7),
+    deletionProtection: true,
+    removalPolicy: cdk.RemovalPolicy.SNAPSHOT,
+  });
+
+  // --- App DB role secret ---
+  const appDbSecret = new cdk.aws_secretsmanager.Secret(scope, "AppDbSecret", {
+    secretName: "expense-tracker/app-db-password",
+    generateSecretString: {
+      secretStringTemplate: JSON.stringify({ username: "app" }),
+      generateStringKey: "password",
+      excludePunctuation: true,
+      passwordLength: 32,
+    },
+  });
+
+  // --- Auth service DB role secret (OTP limiter + agent keys only) ---
+  const authDbSecret = new cdk.aws_secretsmanager.Secret(scope, "AuthDbSecret", {
+    secretName: "expense-tracker/auth-db-password",
+    generateSecretString: {
+      secretStringTemplate: JSON.stringify({ username: "auth_service" }),
+      generateStringKey: "password",
+      excludePunctuation: true,
+      passwordLength: 32,
+    },
+  });
+
+  // --- Worker DB role secret (exchange rate fetcher) ---
+  const workerDbSecret = new cdk.aws_secretsmanager.Secret(scope, "WorkerDbSecret", {
+    secretName: "expense-tracker/worker-db-password",
+    generateSecretString: {
+      secretStringTemplate: JSON.stringify({ username: "worker" }),
+      generateStringKey: "password",
+      excludePunctuation: true,
+      passwordLength: 32,
+    },
+  });
+
+  return { db, appDbSecret, authDbSecret, workerDbSecret };
+}

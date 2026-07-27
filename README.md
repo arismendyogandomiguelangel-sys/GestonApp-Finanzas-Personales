@@ -1,2 +1,68 @@
-# Gestoriha-FP
-Modulo de Gestion de Finanzas Personales en el entorno alihaned Os
+# Expense Budget Tracker
+
+Self-hosted open-source expense and budget tracker with balances, transfers, and multi-currency reporting on Postgres.
+
+![Budget view](docs/budget-screenshot.jpg)
+
+**Live demo:** [expense-budget-tracker.com](https://expense-budget-tracker.com/)
+
+## Features
+
+- **Fully open-source** — all code is available, deploy on your own servers with full control over your data
+- **SQL Query API** — generate an API key, give it to your LLM agent, and let it query, analyze, and manage your financial data via HTTP. Minimal, flat table structure designed to be hard to misuse — ideal for AI agents
+- **Budget and transaction UI** — built-in interface for budgeting, browsing transactions, and tracking balances across accounts and currencies
+
+## Quick start
+
+```bash
+git clone https://github.com/kirill-markin/expense-budget-tracker.git
+cd expense-budget-tracker
+open -a Docker   # start Docker if not running (macOS)
+make up          # start Postgres, run migrations, start web + worker
+```
+
+Open `http://localhost:3000`.
+
+## Usage with AI agents
+
+Start at `GET https://api.expense-budget-tracker.com/v1/`. The discovery response tells agents to ask for the user's email first, and the same email OTP flow covers both signup and login.
+
+1. **Open `GET https://api.expense-budget-tracker.com/v1/` in your agent** — it will discover the OTP onboarding flow automatically
+2. **Complete email OTP login** — the auth service returns a long-lived `ApiKey`
+3. **Give the key to your AI agent** — [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Codex](https://openai.com/index/codex/), or any agent that can call HTTP APIs
+4. **Send the agent screenshots, CSV files, or PDF bank statements** — it parses them and inserts transactions via the SQL API
+5. **Open the web UI** — view actual spending by category and plan the budget for the next month
+
+Example request the agent sends:
+
+```bash
+curl -X POST https://api.expense-budget-tracker.com/v1/sql \
+  -H "Authorization: ApiKey ebta_..." \
+  -H "X-Workspace-Id: workspace-id" \
+  -H "Content-Type: application/json" \
+  -d '{"sql": "INSERT INTO ledger_entries (event_id, ts, account_id, amount, currency, kind, category, counterparty, note) VALUES ('"'"'evt-001'"'"', '"'"'2025-03-15 12:30:00+00'"'"', '"'"'chase-checking'"'"', -42.50, '"'"'USD'"'"', '"'"'spend'"'"', '"'"'groceries'"'"', '"'"'Whole Foods'"'"', '"'"'Weekly groceries'"'"')"}'
+```
+
+After `POST /v1/workspaces/{workspaceId}/select`, the API key remembers that workspace, so `X-Workspace-Id` becomes optional on later `/v1/sql` calls. If the user has exactly one workspace and no saved selection yet, the API auto-saves and uses that single workspace.
+
+## Documentation
+
+- [Deployment](docs/deployment.md) — local Docker Compose and AWS CDK setup
+- [AWS deployment](infra/aws/README.md) — full AWS CDK guide
+
+- [Architecture](docs/architecture.md) — system overview, data model, multi-currency design
+
+## Security considerations
+
+1. **For full privacy, [self-host](infra/aws/README.md) on your own AWS account.** If you deploy or use the hosted service with the AWS/CDK setup described in [`infra/aws/README.md`](infra/aws/README.md), the LLM chat runtime stores transcript state in Postgres. That means chat data is available to:
+   - the deployed service operator, because the data is stored in the service database
+   - OpenAI, because chat requests are sent there to power the feature
+   - Langfuse Cloud, because chat telemetry is exported there
+
+   If you use chat to import bank statements, screenshots, PDFs, CSVs, or other financial files, data extracted from those files can also reach OpenAI and Langfuse as part of chat processing and tracing. If you do not trust even one of these parties, do not store your financial data in this hosted deployment.
+
+2. **The code is already deployed, and the maintainer stores his own real finances there.** Only maintainer Kirill Markin has access to the [demo](https://expense-budget-tracker.com/) database. For partial privacy, sign up with an email that doesn't contain your real name. [Try the demo →](https://expense-budget-tracker.com/)
+
+## License
+
+[MIT](LICENSE)

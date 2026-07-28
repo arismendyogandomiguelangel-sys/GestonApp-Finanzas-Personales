@@ -103,6 +103,40 @@ export default function SettingsAgentPage() {
               />
               <span>Mostrar prefijo ALIAS en la interfaz de usuario</span>
             </label>
+
+            <div>
+              <label style={{ display: "block", fontSize: "0.875rem", color: "#cbd5e1", marginBottom: "6px" }}>Tono de género</label>
+              <select
+                value={profile.agentGender}
+                onChange={(e) => updateProfile({ agentGender: e.target.value as typeof profile.agentGender })}
+                style={{ width: "100%", backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "6px", padding: "10px", color: "#fff" }}
+              >
+                <option value="masculine">Masculino</option>
+                <option value="feminine">Femenino</option>
+                <option value="neutral">Neutro</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "0.875rem", color: "#cbd5e1", marginBottom: "6px" }}>Modo de asistencia</label>
+              <select
+                value={profile.assistanceMode}
+                onChange={(e) => updateProfile({ assistanceMode: e.target.value as typeof profile.assistanceMode })}
+                style={{ width: "100%", backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "6px", padding: "10px", color: "#fff" }}
+              >
+                <option value="objective">Orientado a Objetivos</option>
+                <option value="eventual">Asistencia Eventual</option>
+              </select>
+            </div>
+
+            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", fontSize: "0.9rem" }}>
+              <input
+                type="checkbox"
+                checked={profile.voiceEnabled}
+                onChange={(e) => updateProfile({ voiceEnabled: e.target.checked })}
+              />
+              <span>Modo voz (respuestas habladas)</span>
+            </label>
           </div>
         </div>
       )}

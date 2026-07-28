@@ -33,3 +33,18 @@ apps/web/test-results/
 # Claude Code local state (per-developer)
 .claude/settings.local.json
 .claude/worktrees/
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf

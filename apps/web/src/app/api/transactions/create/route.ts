@@ -9,6 +9,7 @@ import { parseJsonBody } from "@/server/api/validation";
 import { getDemoAmountReport } from "@/server/demo/transactions";
 import { createLedgerEntry } from "@/server/transactions/createLedgerEntry";
 import { extractUserId, extractWorkspaceId } from "@/server/userId";
+import { maybeQueueGoalImpactQuestion } from "@/server/agent/goalImpact";
 
 export const POST = async (request: Request): Promise<Response> =>
   handleRoute(
@@ -36,6 +37,7 @@ export const POST = async (request: Request): Promise<Response> =>
       const userId = extractUserId(request);
       const workspaceId = extractWorkspaceId(request);
       const entry = await createLedgerEntry(userId, workspaceId, body);
+      void maybeQueueGoalImpactQuestion(userId, workspaceId, entry);
       return Response.json(entry);
     },
   );

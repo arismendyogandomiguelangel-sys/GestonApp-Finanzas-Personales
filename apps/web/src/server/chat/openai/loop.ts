@@ -24,6 +24,7 @@ import {
   type ModelCallResult,
 } from "@/server/chat/openai/responses/modelCall";
 import { runOneToolCall } from "@/server/chat/openai/tooling/toolExecutor";
+import { buildSystemPrompt, getAgentProfile } from "@/server/agent/systemPrompt";
 import {
   classifyOpenAITransientError,
   extractOpenAIErrorContext,
@@ -304,6 +305,7 @@ const completeToolLimitSummaryTurn = async (
   baseInput: ReadonlyArray<OpenAI.Responses.ResponseInputItem>,
   continuationItems: Array<StoredOpenAIReplayItem>,
   promptCacheKey: string,
+  instructions: string,
 ): Promise<OpenAILoopCompletion> => {
   log({
     domain: "chat",
@@ -332,6 +334,7 @@ const completeToolLimitSummaryTurn = async (
       params.timezone,
       [],
       [buildToolLimitSummaryInstruction(CHAT_RUN_MAX_TOOL_CALL_MODEL_CALLS)],
+      instructions,
     ),
     promptCacheKey,
     callIndex: summaryCallIndex,
@@ -376,6 +379,8 @@ const runLoopWithDeps = async (
   );
   const continuationItems: Array<StoredOpenAIReplayItem> = [];
   const promptCacheKey = buildPromptCacheKey(params.sessionId);
+  const agentProfile = await getAgentProfile(params.userId, params.workspaceId);
+  const instructions = buildSystemPrompt(agentProfile);
 
   const retryBackoffMs = dependencies.getModelCallRetryBackoffMs();
   for (let callIndex = 1; callIndex <= CHAT_RUN_MAX_TOOL_CALL_MODEL_CALLS; callIndex += 1) {
@@ -393,6 +398,7 @@ const runLoopWithDeps = async (
         params.userId,
         params.sessionId,
         params.timezone,
+        instructions,
       ),
       promptCacheKey,
       callIndex,
@@ -448,6 +454,7 @@ const runLoopWithDeps = async (
         baseInput,
         continuationItems,
         promptCacheKey,
+        instructions,
       );
     }
   }

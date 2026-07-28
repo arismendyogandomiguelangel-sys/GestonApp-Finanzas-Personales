@@ -9,7 +9,16 @@ import {
   LifeSituation,
   useProfile,
 } from "@/ui/profile/profileContext";
+import { fetchWithCsrf } from "@/lib/csrf";
 import styles from "./OnboardingModal.module.css";
+
+type QuickGoal = "budget" | "spend" | "savings";
+
+const QUICK_GOAL_REDIRECT: Record<QuickGoal, string> = {
+  budget: "/budget",
+  spend: "/transactions",
+  savings: "/planificacion",
+};
 
 const ECONOMIC_ACTIVITIES: { id: EconomicActivity; labelKey: string }[] = [
   { id: "employee", labelKey: "onboarding.act.employee" },
@@ -39,6 +48,10 @@ export function OnboardingModal() {
   const [mode, setMode] = useState<"initial" | "quick" | "guided">("initial");
   const [userName, setUserName] = useState(profile.userName);
 
+  // Quick route state (checklist 1.3: nombre + objetivo + moneda, sin mencionar IA)
+  const [quickGoal, setQuickGoal] = useState<QuickGoal>("spend");
+  const [quickCurrency, setQuickCurrency] = useState<"DOP" | "USD">("DOP");
+
   // Guided wizard state
   const [step, setStep] = useState(1);
   const [agentName, setAgentName] = useState("Axel");
@@ -61,6 +74,14 @@ export function OnboardingModal() {
       },
       "quick"
     );
+    fetchWithCsrf("/api/workspace-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reportingCurrency: quickCurrency }),
+    }).catch(() => {
+      // Currency defaults server-side if this fails; not worth blocking onboarding
+    });
+    window.location.href = QUICK_GOAL_REDIRECT[quickGoal];
   };
 
   const handleGuidedFinish = () => {
@@ -124,10 +145,7 @@ export function OnboardingModal() {
                 </div>
                 <button
                   className={styles.primaryBtn}
-                  onClick={() => {
-                    setMode("quick");
-                    handleQuickFinish();
-                  }}
+                  onClick={() => setMode("quick")}
                 >
                   {t("onboarding.quickStartBtn")}
                 </button>
@@ -148,6 +166,50 @@ export function OnboardingModal() {
               </div>
             </div>
           </>
+        )}
+
+        {mode === "quick" && (
+          <div className={styles.wizardStep}>
+            <h3 className={styles.cardTitle}>{t("onboarding.quick.goalTitle")}</h3>
+
+            <div className={styles.inputGroup}>
+              {(["spend", "budget", "savings"] as const).map((goal) => (
+                <label
+                  key={goal}
+                  className={`${styles.checkboxLabel} ${quickGoal === goal ? styles.checkboxLabelSelected : ""}`}
+                >
+                  <input
+                    type="radio"
+                    name="quickGoal"
+                    checked={quickGoal === goal}
+                    onChange={() => setQuickGoal(goal)}
+                  />
+                  <span>{t(`onboarding.quick.goal${goal === "spend" ? "Spend" : goal === "budget" ? "Budget" : "Savings"}`)}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>{t("onboarding.quick.currencyLabel")}</label>
+              <select
+                className={styles.input}
+                value={quickCurrency}
+                onChange={(e) => setQuickCurrency(e.target.value as "DOP" | "USD")}
+              >
+                <option value="DOP">DOP 🇩🇴</option>
+                <option value="USD">USD 🇺🇸</option>
+              </select>
+            </div>
+
+            <div className={styles.navRow}>
+              <button className={styles.secondaryBtn} onClick={() => setMode("initial")}>
+                {t("common.back")}
+              </button>
+              <button className={styles.primaryBtn} onClick={handleQuickFinish}>
+                {t("onboarding.quick.confirmBtn")}
+              </button>
+            </div>
+          </div>
         )}
 
         {mode === "guided" && (

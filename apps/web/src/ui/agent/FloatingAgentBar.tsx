@@ -2,12 +2,22 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
 import { useProfile } from "@/ui/profile/profileContext";
+import { NAVIGATION_STRUCTURE } from "@/lib/navigation";
+import { speakText } from "@/lib/tts";
 import styles from "./FloatingAgentBar.module.css";
+
+const ACK_BY_GENDER: Record<string, string> = {
+  masculine: "Listo, lo envié a ALIAS.",
+  feminine: "Lista, lo envié a ALIAS.",
+  neutral: "Enviado a ALIAS.",
+};
 
 export function FloatingAgentBar() {
   const { profile, getAgentDisplayName } = useProfile();
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -16,10 +26,23 @@ export function FloatingAgentBar() {
     return null;
   }
 
+  // Context-aware (checklist 2.3): the current module travels with the
+  // message so ALIAS knows where the user was when they asked.
+  const currentModule = NAVIGATION_STRUCTURE.find((item) =>
+    item.baseHref === "/"
+      ? pathname === "/" || pathname === "/actividad"
+      : pathname.startsWith(item.baseHref)
+  );
+  const moduleLabel = currentModule ? t(currentModule.labelKey) : "";
+
   const handleSend = () => {
     if (!input.trim()) return;
-    // Redirect or send to chat
-    window.location.href = `/chat?q=${encodeURIComponent(input.trim())}`;
+    if (profile.voiceEnabled) {
+      speakText(ACK_BY_GENDER[profile.agentGender] ?? ACK_BY_GENDER.neutral, profile.agentGender);
+    }
+    const params = new URLSearchParams({ q: input.trim() });
+    if (moduleLabel !== "") params.set("context", moduleLabel);
+    window.location.href = `/chat?${params.toString()}`;
     setInput("");
   };
 

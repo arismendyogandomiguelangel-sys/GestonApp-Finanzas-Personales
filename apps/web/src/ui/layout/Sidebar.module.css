@@ -168,6 +168,14 @@
   border-block-start: 1px solid var(--border-color, #334155);
 }
 
+.mobileToggleBtn {
+  display: none;
+}
+
+.mobileOverlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
@@ -179,5 +187,30 @@
 
   .sidebarMobileOpen {
     transform: translateX(0) !important;
+  }
+
+  .mobileToggleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset-block-start: 12px;
+    inset-inline-start: 12px;
+    z-index: 90;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color, #334155);
+    border-radius: 8px;
+    background-color: var(--sidebar-bg, #0f172a);
+    color: var(--sidebar-color, #f8fafc);
+    cursor: pointer;
+  }
+
+  .mobileOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
   }
 }

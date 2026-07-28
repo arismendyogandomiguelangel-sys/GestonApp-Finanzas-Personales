@@ -15,6 +15,7 @@ export type OpenAIResponsesRequest = Readonly<{
   model: typeof CHAT_MODEL_ID;
   store: false;
   include: ["reasoning.encrypted_content"];
+  instructions: string;
   tools: Array<OpenAI.Responses.Tool>;
   input: Array<OpenAI.Responses.ResponseInputItem>;
   reasoning: Readonly<{
@@ -64,10 +65,12 @@ export const buildOpenAIResponsesRequest = (
   userId: string,
   sessionId: string,
   timezone: string,
+  instructions: string,
 ): OpenAIResponsesRequest => ({
   model: CHAT_MODEL_ID,
   store: false,
   include: ["reasoning.encrypted_content"],
+  instructions,
   tools: [...OPENAI_CHAT_TOOLS],
   input: buildOpenAIInput(baseInput, continuationItems, []),
   reasoning: {
@@ -86,10 +89,12 @@ export const buildOpenAIResponsesRequestWithOptions = (
   timezone: string,
   tools: ReadonlyArray<OpenAI.Responses.Tool>,
   extraInput: ReadonlyArray<OpenAI.Responses.ResponseInputItem>,
+  instructions: string,
 ): OpenAIResponsesRequest => ({
   model: CHAT_MODEL_ID,
   store: false,
   include: ["reasoning.encrypted_content"],
+  instructions,
   tools: [...tools],
   input: buildOpenAIInput(baseInput, continuationItems, extraInput),
   reasoning: {

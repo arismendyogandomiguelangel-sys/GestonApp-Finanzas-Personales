@@ -43,6 +43,7 @@ const SIDEBAR_COOKIE = "sidebar_state";
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const { hasBusinessFeatures } = useProfile();
   const { t } = useTranslation();
@@ -55,6 +56,11 @@ export function Sidebar() {
     }
   }, []);
 
+  // Close the mobile drawer on navigation.
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
   const toggleCollapse = () => {
     const nextState = !collapsed;
     setCollapsed(nextState);
@@ -66,48 +72,73 @@ export function Sidebar() {
   );
 
   return (
-    <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""}`}>
-      <div className={styles.header}>
-        <Link href="/" className={styles.brand}>
-          <div className={styles.logoIcon}>G</div>
-          <span className={styles.brandText}>GestionIHA</span>
-        </Link>
-        <button
-          className={styles.toggleBtn}
-          onClick={toggleCollapse}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {collapsed ? (
-              <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
-            ) : (
-              <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
-            )}
-          </svg>
-        </button>
-      </div>
+    <>
+      <button
+        className={styles.mobileToggleBtn}
+        onClick={() => setMobileOpen(true)}
+        aria-label={t("nav.openMenu", { defaultValue: "Abrir menú" })}
+        title={t("nav.openMenu", { defaultValue: "Abrir menú" })}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
 
-      <nav className={styles.navSection}>
-        {filteredNav.map((item) => {
-          const isActive =
-            item.baseHref === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.baseHref);
+      {mobileOpen && (
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setMobileOpen(false)}
+          role="presentation"
+        />
+      )}
 
-          return (
-            <Link
-              key={item.id}
-              href={item.baseHref}
-              className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              title={collapsed ? t(item.labelKey) : undefined}
-            >
-              <span className={styles.itemIcon}>{renderIcon(item.iconName)}</span>
-              <span className={styles.itemLabel}>{t(item.labelKey)}</span>
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+      <aside
+        className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ""} ${mobileOpen ? styles.sidebarMobileOpen : ""}`}
+      >
+        <div className={styles.header}>
+          <Link href="/" className={styles.brand}>
+            <div className={styles.logoIcon}>G</div>
+            <span className={styles.brandText}>GestionIHA</span>
+          </Link>
+          <button
+            className={styles.toggleBtn}
+            onClick={toggleCollapse}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {collapsed ? (
+                <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
+              ) : (
+                <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        <nav className={styles.navSection}>
+          {filteredNav.map((item) => {
+            const isActive =
+              item.baseHref === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.baseHref);
+
+            return (
+              <Link
+                key={item.id}
+                href={item.baseHref}
+                className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+                title={collapsed ? t(item.labelKey) : undefined}
+              >
+                <span className={styles.itemIcon}>{renderIcon(item.iconName)}</span>
+                <span className={styles.itemLabel}>{t(item.labelKey)}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }

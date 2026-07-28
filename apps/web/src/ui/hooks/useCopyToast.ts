@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { logClientError } from "@/lib/clientLogger";
+
 type CopyToastState = Readonly<{
   toastMessage: string | null;
   copyToClipboard: (text: string) => void;
@@ -18,7 +20,7 @@ export const useCopyToast = (): CopyToastState => {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const copyToClipboard = useCallback((text: string): void => {
-    navigator.clipboard.writeText(text).catch((error) => console.error(error));
+    navigator.clipboard.writeText(text).catch((error) => logClientError("useCopyToast", error));
     setToastMessage(`Copied: ${text}`);
     if (timerRef.current !== null) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setToastMessage(null), TOAST_DURATION_MS);

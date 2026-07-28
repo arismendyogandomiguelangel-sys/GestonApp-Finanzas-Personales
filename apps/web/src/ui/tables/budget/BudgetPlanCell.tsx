@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/cn";
+import { logClientError } from "@/lib/clientLogger";
 import { useFormat } from "@/ui/FormatProvider";
 import { postBudgetPlan, postBudgetPlanFill, fetchComment, postComment } from "@/ui/tables/budget/budgetTableApi";
 import { formatAmount, isDecember } from "@/ui/tables/budget/budgetTableLogic";
@@ -144,7 +145,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
         setCommentInput(val);
         originalComment.current = val;
       })
-      .catch((error) => console.error(error))
+      .catch((error) => logClientError("BudgetPlanCell.fetchComment", error))
       .finally(() => setIsLoadingComment(false));
   };
 
@@ -217,7 +218,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
       postBudgetPlan({ month, direction, category, kind: "base", plannedValue: newBase })
         .catch((error) => {
           onPlanSave(month, direction, category, "base", originalBase.current);
-          console.error(error);
+          logClientError("BudgetPlanCell.saveChanges.base", error);
         })
         .finally(onSyncEnd);
     }
@@ -228,7 +229,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
       postBudgetPlan({ month, direction, category, kind: "modifier", plannedValue: newMod })
         .catch((error) => {
           onPlanSave(month, direction, category, "modifier", originalModifier.current);
-          console.error(error);
+          logClientError("BudgetPlanCell.saveChanges.modifier", error);
         })
         .finally(onSyncEnd);
     }
@@ -237,7 +238,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
       onSyncStart();
       onCommentPresenceChange(month, direction, category, commentInput.trim().length > 0);
       postComment({ month, direction, category, comment: commentInput })
-        .catch((error) => console.error(error))
+        .catch((error) => logClientError("BudgetPlanCell.saveChanges.comment", error))
         .finally(onSyncEnd);
     }
   }, [baseInput, modifierInput, commentInput, month, direction, category, onPlanSave, onCommentPresenceChange, onSyncStart, onSyncEnd]);
@@ -259,7 +260,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
       postBudgetPlan({ month, direction, category, kind: "base", plannedValue: newBase })
         .catch((error) => {
           onPlanSave(month, direction, category, "base", originalBase.current);
-          console.error(error);
+          logClientError("BudgetPlanCell.handleFill.base", error);
         })
         .finally(onSyncEnd);
     }
@@ -272,7 +273,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
       postBudgetPlan({ month, direction, category, kind: "modifier", plannedValue: newMod })
         .catch((error) => {
           onPlanSave(month, direction, category, "modifier", originalModifier.current);
-          console.error(error);
+          logClientError("BudgetPlanCell.handleFill.modifier", error);
         })
         .finally(onSyncEnd);
     }
@@ -282,7 +283,7 @@ export const BudgetPlanCell = (props: BudgetPlanCellProps): ReactElement => {
     onFillMonths(month, direction, category, newBase);
     postBudgetPlanFill({ fromMonth: month, direction, category, baseValue: newBase })
       .catch((error) => {
-        console.error(error);
+        logClientError("BudgetPlanCell.handleFill.fillMonths", error);
       })
       .finally(onSyncEnd);
 

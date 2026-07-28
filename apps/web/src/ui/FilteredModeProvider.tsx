@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, type ReactElement, type ReactNode } from "react";
 
+import { logClientError } from "@/lib/clientLogger";
+
 type VisibilityMode = "all" | "filtered";
 
 type FilteredModeContextValue = Readonly<{
@@ -53,7 +55,7 @@ export const FilteredModeProvider = (props: ProviderProps): ReactElement => {
         return res.json() as Promise<{ categories: ReadonlyArray<string> }>;
       })
       .then((data) => setAllCategories(data.categories))
-      .catch((err: unknown) => console.error("Failed to fetch categories:", err));
+      .catch((err: unknown) => logClientError("FilteredModeProvider.fetchCategories", err));
   }, []);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export const FilteredModeProvider = (props: ProviderProps): ReactElement => {
           setAllowedCategories(new Set(data.filteredCategories));
         }
       })
-      .catch((err: unknown) => console.error("Failed to fetch filtered categories:", err))
+      .catch((err: unknown) => logClientError("FilteredModeProvider.fetchFilteredCategories", err))
       .finally(() => setCategoriesLoading(false));
   }, []);
 

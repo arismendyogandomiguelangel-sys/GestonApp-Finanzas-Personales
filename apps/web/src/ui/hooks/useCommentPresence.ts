@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { buildLiveDataUrl, fetchLiveData } from "@/lib/liveDataFetch";
+import { logClientError } from "@/lib/clientLogger";
 import type { CommentedCell } from "@/server/budget/getCommentedCells";
 
 type CommentPresenceResult = Readonly<{
@@ -56,7 +57,7 @@ export const useCommentPresence = (
         const keys = new Set(cells.map((c) => cellKey(c.month, c.direction, c.category)));
         setCommentedCells(keys);
       })
-      .catch((error) => console.error("Failed to load comment presence:", error));
+      .catch((error) => logClientError("useCommentPresence.initialLoad", error));
   }, [initialMonthFrom, initialMonthTo, refreshToken]);
 
   const fetchRange = useCallback((monthFrom: string, monthTo: string): void => {
@@ -72,7 +73,7 @@ export const useCommentPresence = (
           return merged;
         });
       })
-      .catch((error) => console.error("Failed to load comment presence for range:", error));
+      .catch((error) => logClientError("useCommentPresence.fetchRange", error));
   }, [refreshToken]);
 
   const reloadRange = useCallback((monthFrom: string, monthTo: string): void => {
@@ -81,7 +82,7 @@ export const useCommentPresence = (
         const keys = new Set(cells.map((c) => cellKey(c.month, c.direction, c.category)));
         setCommentedCells(keys);
       })
-      .catch((error) => console.error("Failed to reload comment presence for range:", error));
+      .catch((error) => logClientError("useCommentPresence.reloadRange", error));
   }, [refreshToken]);
 
   const updateCell = useCallback((month: string, direction: string, category: string, hasComment: boolean): void => {

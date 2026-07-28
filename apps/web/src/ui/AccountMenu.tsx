@@ -181,13 +181,6 @@ export const AccountMenu = (props: Props): ReactElement | null => {
             </form>
           )}
           <div className={styles.separator} />
-          <a
-            className={styles.item}
-            href="/login"
-            style={{ textDecoration: "none" }}
-          >
-            🔑 Iniciar Sesión / Registro
-          </a>
           <button
             className={styles.item}
             type="button"

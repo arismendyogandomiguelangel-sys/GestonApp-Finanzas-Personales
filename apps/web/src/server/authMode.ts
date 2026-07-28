@@ -1,10 +1,11 @@
-export type AuthMode = "none" | "cognito";
+export type AuthMode = "none" | "cognito" | "insforge";
 
 type AuthModeEnv = Readonly<{
   AUTH_MODE?: string;
   NODE_ENV?: string;
   HOST?: string;
   CORS_ORIGIN?: string;
+  INSFORGE_BASE_URL?: string;
 }>;
 
 const LOCAL_HOSTS: ReadonlySet<string> = new Set([
@@ -28,18 +29,57 @@ const isLocalHttpOrigin = (value: string): boolean => {
   }
 };
 
+const isHttpsUrl = (value: string): boolean => {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * AUTH_MODE=insforge — identity comes from an InsForge-issued RS256 JWT held in
+ * the `session` cookie and verified against the project JWKS. Unlike "none",
+ * this mode is safe in production: every request carries a signed identity.
+ */
+const getInsforgeValidationErrors = (env: AuthModeEnv): ReadonlyArray<string> => {
+  const errors: Array<string> = [];
+
+  const baseUrl = env.INSFORGE_BASE_URL;
+  if (baseUrl === undefined || baseUrl.trim() === "") {
+    errors.push("AUTH_MODE=insforge requires INSFORGE_BASE_URL (e.g. https://<app>.insforge.app)");
+  } else if (!isHttpsUrl(baseUrl)) {
+    errors.push(`AUTH_MODE=insforge requires INSFORGE_BASE_URL to be an https URL. Received "${baseUrl}"`);
+  }
+
+  const corsOrigin = env.CORS_ORIGIN;
+  if (corsOrigin === undefined || corsOrigin.trim() === "") {
+    errors.push("AUTH_MODE=insforge requires CORS_ORIGIN to be set (required for CSRF protection)");
+  } else if (!isHttpsUrl(corsOrigin) && !isLocalHttpOrigin(corsOrigin)) {
+    errors.push(
+      `AUTH_MODE=insforge requires CORS_ORIGIN to be an https origin (or a local http origin in dev). Received "${corsOrigin}"`,
+    );
+  }
+
+  return errors;
+};
+
 export const getAuthModeValidationErrors = (env: AuthModeEnv): ReadonlyArray<string> => {
   const rawAuthMode = env.AUTH_MODE;
   if (rawAuthMode === undefined || rawAuthMode.trim() === "") {
     return ['AUTH_MODE must be set explicitly to "none" or "cognito"'];
   }
 
-  if (rawAuthMode !== "none" && rawAuthMode !== "cognito") {
-    return [`Invalid AUTH_MODE="${rawAuthMode}". Expected "none" or "cognito"`];
+  if (rawAuthMode !== "none" && rawAuthMode !== "cognito" && rawAuthMode !== "insforge") {
+    return [`Invalid AUTH_MODE="${rawAuthMode}". Expected "none", "cognito", or "insforge"`];
   }
 
   if (rawAuthMode === "cognito") {
     return [];
+  }
+
+  if (rawAuthMode === "insforge") {
+    return getInsforgeValidationErrors(env);
   }
 
   const errors: Array<string> = [];
@@ -72,9 +112,9 @@ export const getConfiguredAuthMode = (env: AuthModeEnv): AuthMode => {
   }
 
   const authMode = env.AUTH_MODE;
-  if (authMode === "none" || authMode === "cognito") {
+  if (authMode === "none" || authMode === "cognito" || authMode === "insforge") {
     return authMode;
   }
 
-  throw new Error('AUTH_MODE must be set explicitly to "none" or "cognito"');
+  throw new Error('AUTH_MODE must be set explicitly to "none", "cognito", or "insforge"');
 };

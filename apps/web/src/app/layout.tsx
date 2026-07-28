@@ -43,9 +43,13 @@ export default async function RootLayout(props: Readonly<{ children: React.React
   const { children } = props;
   const headersList = await headers();
   const requestPath = headersList.get("x-request-path") ?? "";
-  const isPublicMonthlySharePage = requestPath.startsWith("/share/monthly/");
+  // Pages reachable without a session: they carry no identity headers, so the
+  // authenticated chrome below (which reads x-user-id) must be skipped.
+  const isUnauthenticatedPage = requestPath.startsWith("/share/monthly/")
+    || requestPath === "/login"
+    || requestPath.startsWith("/login?");
 
-  if (isPublicMonthlySharePage) {
+  if (isUnauthenticatedPage) {
     const publicLocale = await getLocaleCookie();
 
     return (
@@ -63,7 +67,8 @@ export default async function RootLayout(props: Readonly<{ children: React.React
   const { chatOpen, chatWidth } = await readChatCookies();
   const currentUserId = extractUserIdFromHeaders(headersList);
 
-  const authEnabled = process.env.AUTH_MODE === "cognito";
+  const authMode = process.env.AUTH_MODE;
+  const authEnabled = authMode === "cognito" || authMode === "insforge";
   let reportingCurrency = "USD";
   let workspaces: ReadonlyArray<WorkspaceSummary> = [];
   let currentWorkspaceId = "";

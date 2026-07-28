@@ -17,7 +17,11 @@ const connectionString = process.env.AUTH_MODE === "cognito"
 // ssl:true enables full certificate verification. RDS certs are signed by
 // Amazon's CA (not in Node.js defaults), so NODE_EXTRA_CA_CERTS must point
 // to the RDS CA bundle (set in CDK, bundle downloaded in Dockerfile).
-const ssl = process.env.AUTH_MODE === "cognito" ? true : false;
+// Managed providers (RDS, InsForge, Neon, Supabase) require TLS. Enable it whenever
+// the connection string asks for it so credentials and financial data are never
+// sent in the clear over the public internet.
+const ssl = process.env.AUTH_MODE === "cognito"
+  || (connectionString ?? "").includes("sslmode=require");
 
 const pool = new pg.Pool({ connectionString, ssl });
 

@@ -188,6 +188,9 @@ type SqlApiEvent =
 type AuthEvent =
   | Readonly<{ domain: "auth"; action: "refresh" }>
   | Readonly<{ domain: "auth"; action: "proxy_auth_error"; error: string }>
+  | Readonly<{ domain: "auth"; action: "proxy_insforge_auth_error"; error: string }>
+  | Readonly<{ domain: "auth"; action: "proxy_insforge_refresh_failed"; error: string }>
+  | Readonly<{ domain: "auth"; action: "insforge_sign_in_rejected"; error: string }>
   | Readonly<{ domain: "auth"; action: "error"; error: string }>;
 
 type LogEvent = ChatEvent | ChatTranscriptionEvent | ApiEvent | SqlApiEvent | AuthEvent;

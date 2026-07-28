@@ -11,21 +11,27 @@ import { getConfiguredAuthMode } from "@/server/authMode";
 
 export const POST = async (): Promise<Response> => {
   const authMode = getConfiguredAuthMode(process.env);
-  if (authMode !== "cognito") {
-    return Response.json({ error: "Logout not available: AUTH_MODE is not cognito" }, { status: 400 });
+  if (authMode === "none") {
+    return Response.json({ error: "Logout not available: AUTH_MODE is none" }, { status: 400 });
   }
 
-  // Revoke refresh token server-side (best-effort, never blocks logout)
-  const jar = await cookies();
-  const refreshToken = jar.get("refresh")?.value ?? "";
-  if (refreshToken !== "") {
-    await revokeRefreshToken(refreshToken);
+  // Revoke refresh token server-side (best-effort, never blocks logout).
+  // InsForge rotates and expires its own refresh tokens, so clearing the
+  // cookies is enough there; only Cognito needs an explicit revocation call.
+  if (authMode === "cognito") {
+    const jar = await cookies();
+    const refreshToken = jar.get("refresh")?.value ?? "";
+    if (refreshToken !== "") {
+      await revokeRefreshToken(refreshToken);
+    }
   }
 
   const headers = new Headers();
   headers.set("Content-Type", "application/json");
 
   clearAuthCookies(headers);
+  // Drop the active workspace so the next sign-in re-bootstraps it.
+  headers.append("Set-Cookie", "workspace=; Path=/; Max-Age=0; Secure; SameSite=Lax");
 
   // Clear legacy ALB session cookies
   for (let i = 0; i <= 2; i++) {

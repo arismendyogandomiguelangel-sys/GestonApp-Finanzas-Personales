@@ -85,6 +85,17 @@ export const register = (): void => {
     }
   }
 
+  if (authMode === "insforge") {
+    const baseUrl = process.env.INSFORGE_BASE_URL;
+    if (baseUrl === undefined || baseUrl === "") {
+      errors.push("INSFORGE_BASE_URL must be set when AUTH_MODE=insforge");
+    }
+    const anonKey = process.env.INSFORGE_ANON_KEY;
+    if (anonKey === undefined || anonKey === "") {
+      errors.push("INSFORGE_ANON_KEY must be set when AUTH_MODE=insforge (required to sign in)");
+    }
+  }
+
   if (authMode === "cognito") {
     if (!process.env.DB_HOST) errors.push("DB_HOST must be set when AUTH_MODE=cognito");
     if (!process.env.DB_PASSWORD) errors.push("DB_PASSWORD must be set when AUTH_MODE=cognito");

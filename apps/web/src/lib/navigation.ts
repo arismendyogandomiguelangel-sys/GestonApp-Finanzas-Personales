@@ -35,7 +35,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "Home",
     tabs: [
       { id: "summary", href: "/", labelKey: "nav.tabs.home_summary" },
-      { id: "activity", href: "/actividad", labelKey: "nav.tabs.home_activity" },
     ],
   },
   {
@@ -45,10 +44,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "Receipt",
     tabs: [
       { id: "tx_list", href: "/transactions", labelKey: "nav.tabs.tx_list" },
-      { id: "tx_new", href: "/transactions/nueva", labelKey: "nav.tabs.tx_new" },
-      { id: "tx_categories", href: "/transactions/categorias", labelKey: "nav.tabs.tx_categories" },
-      { id: "tx_recurring", href: "/transactions/recurrentes", labelKey: "nav.tabs.tx_recurring" },
-      { id: "tx_transfers", href: "/transactions/transferencias", labelKey: "nav.tabs.tx_transfers" },
     ],
   },
   {
@@ -58,8 +53,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "PieChart",
     tabs: [
       { id: "matrix", href: "/budget", labelKey: "nav.tabs.budget_matrix" },
-      { id: "compare", href: "/budget/comparativa", labelKey: "nav.tabs.budget_compare" },
-      { id: "settings", href: "/budget/ajustes", labelKey: "nav.tabs.budget_settings" },
     ],
   },
   {
@@ -69,8 +62,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "Wallet",
     tabs: [
       { id: "accounts", href: "/balances", labelKey: "nav.tabs.balances_accounts" },
-      { id: "reconcile", href: "/balances/conciliacion", labelKey: "nav.tabs.balances_reconcile" },
-      { id: "currencies", href: "/balances/divisas", labelKey: "nav.tabs.balances_currencies" },
     ],
   },
   {
@@ -115,10 +106,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "BarChart3",
     tabs: [
       { id: "interactive", href: "/dashboards", labelKey: "nav.tabs.dash_interactive" },
-      { id: "annual", href: "/dashboards/anual", labelKey: "nav.tabs.dash_annual" },
-      { id: "categories", href: "/dashboards/categorias", labelKey: "nav.tabs.dash_categories" },
-      { id: "trends", href: "/dashboards/tendencias", labelKey: "nav.tabs.dash_trends" },
-      { id: "templates", href: "/dashboards/templates", labelKey: "nav.tabs.dash_templates" },
     ],
   },
   {
@@ -128,9 +115,6 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "Download",
     tabs: [
       { id: "dgii", href: "/exportacion", labelKey: "nav.tabs.exp_dgii" },
-      { id: "reports", href: "/exportacion/reportes", labelKey: "nav.tabs.exp_reports" },
-      { id: "backup", href: "/exportacion/backup", labelKey: "nav.tabs.exp_backup" },
-      { id: "history", href: "/exportacion/historial", labelKey: "nav.tabs.exp_history" },
     ],
   },
   {
@@ -166,13 +150,7 @@ export const NAVIGATION_STRUCTURE: ReadonlyArray<SidebarItem> = [
     iconName: "Settings",
     tabs: [
       { id: "general", href: "/settings", labelKey: "nav.tabs.set_general" },
-      { id: "profile", href: "/settings/perfil", labelKey: "nav.tabs.set_profile" },
       { id: "agent", href: "/settings/agente", labelKey: "nav.tabs.set_agent" },
-      { id: "currency", href: "/settings/monedas", labelKey: "nav.tabs.set_currency" },
-      { id: "categories", href: "/settings/categorias", labelKey: "nav.tabs.set_categories" },
-      { id: "notifications", href: "/settings/notificaciones", labelKey: "nav.tabs.set_notifications" },
-      { id: "apikeys", href: "/settings/apikeys", labelKey: "nav.tabs.set_apikeys" },
-      { id: "data", href: "/settings/datos", labelKey: "nav.tabs.set_data" },
     ],
   },
 ];

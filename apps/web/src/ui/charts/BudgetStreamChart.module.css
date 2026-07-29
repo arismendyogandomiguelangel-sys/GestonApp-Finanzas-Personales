@@ -2,7 +2,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px 12px;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: #fbfcff;
   font-size: 11px;
   color: var(--text);
   align-items: center;
@@ -29,6 +33,11 @@
 .chartWrap {
   position: relative;
   width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel-raised);
+  box-shadow: var(--shadow-sm);
 }
 
 .chartWrap svg {
@@ -43,9 +52,10 @@
   font-size: 12px;
   white-space: nowrap;
   color: #f0f0f0;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 4px;
+  background: #172033;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   pointer-events: none;
   z-index: 10;
 }

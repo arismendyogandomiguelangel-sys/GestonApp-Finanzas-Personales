@@ -1,5 +1,5 @@
 .form {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -8,7 +8,7 @@
 .row {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   max-width: 360px;
 }
 
@@ -18,7 +18,8 @@
 
 .label {
   font-size: 13px;
-  color: var(--muted);
+  color: #475569;
+  font-weight: 650;
 }
 
 .control {
@@ -31,9 +32,10 @@
 .input {
   font-family: inherit;
   font-size: 13px;
-  padding: 6px 8px;
+  padding: 9px 10px;
   border: 1px solid var(--panel-border);
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--panel-raised);
   color: var(--text);
   min-width: 100px;
 }
@@ -50,9 +52,10 @@
 .save {
   font-family: inherit;
   font-size: 13px;
-  padding: 6px 12px;
+  padding: 9px 14px;
   border: 1px solid var(--panel-border);
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--panel-raised);
   color: var(--muted);
   cursor: var(--cursor-pointer);
 }
@@ -63,9 +66,9 @@
 }
 
 .save:not(:disabled) {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
 }
 
 .save:not(:disabled):hover {
@@ -171,9 +174,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  padding: 20px;
   border: 1px solid var(--panel-border);
-  background: var(--bg);
+  border-radius: var(--radius-md);
+  background: #fbfcff;
+  box-shadow: var(--shadow-sm);
   min-width: 0;
 }
 

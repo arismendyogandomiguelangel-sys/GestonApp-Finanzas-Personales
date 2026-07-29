@@ -3,8 +3,11 @@
   gap: 16px;
   align-items: flex-end;
   flex-wrap: wrap;
-  padding-inline-end: 16px;
-  margin-bottom: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: #f8faff;
 }
 
 .filterLabel {
@@ -18,11 +21,11 @@
 .filterInput {
   font-family: inherit;
   font-size: 13px;
-  padding: 4px 8px;
-  block-size: 31px;
+  padding: 7px 10px;
+  block-size: 36px;
   border: 1px solid var(--panel-border);
-  border-radius: 0;
-  background: var(--bg);
+  border-radius: var(--radius-sm);
+  background: var(--panel-raised);
   color: var(--text);
   box-sizing: border-box;
   line-height: 1.2;
@@ -48,7 +51,8 @@
 }
 
 .filterTriggerOpen {
-  border-color: var(--text);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .filterTriggerText {

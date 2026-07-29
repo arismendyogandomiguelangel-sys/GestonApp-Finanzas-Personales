@@ -55,6 +55,7 @@
 }
 
 .passwordInput {
+  box-sizing: border-box;
   width: 100%;
   margin-bottom: 0;
   padding-inline-end: 44px;
@@ -105,6 +106,12 @@
   color: hsl(0 72% 42%);
 }
 
+.notice {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: hsl(217 70% 35%);
+}
+
 .button {
   padding: 10px 16px;
   border: none;
@@ -123,4 +130,25 @@
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.modeSwitch {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: hsl(220 10% 45%);
+}
+
+.modeSwitch button {
+  padding: 0;
+  border: 0;
+  color: hsl(217 91% 44%);
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modeSwitch button:hover {
+  text-decoration: underline;
 }

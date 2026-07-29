@@ -43,7 +43,7 @@ export const POST = async (request: Request): Promise<Response> =>
         if (err instanceof InsforgeSignInError) {
           // Log the reason server-side but never leak which factor failed.
           log({ domain: "auth", action: "insforge_sign_in_rejected", error: err.message });
-          return jsonNoStore({ error: "Invalid credentials" }, { status: 401 });
+          return jsonNoStore({ error: "Correo o contraseña incorrectos" }, { status: 401 });
         }
         throw err;
       }

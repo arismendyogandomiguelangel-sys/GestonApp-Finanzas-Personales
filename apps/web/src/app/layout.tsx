@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect, unstable_rethrow } from "next/navigation";
 
@@ -7,6 +8,7 @@ import { readChatCookies } from "@/lib/chatCookies";
 import { isDemoMode } from "@/lib/demoMode";
 import { DEFAULT_USER_SETTINGS, RTL_LOCALES, type SupportedLocale } from "@/lib/locale";
 import { getLocaleCookie } from "@/lib/localeCookie";
+import { resolveTheme } from "@/lib/theme";
 import { NAV_LINKS } from "@/lib/navigation";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { t } from "@/i18n/serverT";
@@ -24,6 +26,8 @@ import { FilteredBanner } from "@/ui/FilteredBanner";
 import { FilteredModeProvider } from "@/ui/FilteredModeProvider";
 import { FormatProvider } from "@/ui/FormatProvider";
 import { ModeToggle } from "@/ui/ModeToggle";
+import { LanguageToggle } from "@/ui/LanguageToggle";
+import { ThemeToggle } from "@/ui/ThemeToggle";
 import { ProfileProvider } from "@/ui/profile/profileContext";
 import { Sidebar } from "@/ui/layout/Sidebar";
 import { TabBar } from "@/ui/layout/TabBar";
@@ -42,6 +46,7 @@ import { LearningBanner } from "@/ui/agent/LearningBanner";
 export default async function RootLayout(props: Readonly<{ children: React.ReactNode }>) {
   const { children } = props;
   const headersList = await headers();
+  const theme = resolveTheme((await cookies()).get("theme")?.value);
   const requestPath = headersList.get("x-request-path") ?? "";
   // Pages reachable without a session: they carry no identity headers, so the
   // authenticated chrome below (which reads x-user-id) must be skipped.
@@ -53,7 +58,7 @@ export default async function RootLayout(props: Readonly<{ children: React.React
     const publicLocale = await getLocaleCookie();
 
     return (
-      <html lang={publicLocale} dir={RTL_LOCALES.has(publicLocale) ? "rtl" : "ltr"}>
+      <html lang={publicLocale} dir={RTL_LOCALES.has(publicLocale) ? "rtl" : "ltr"} data-theme={theme}>
         <body>
           <I18nProvider locale={publicLocale}>
             {children}
@@ -114,7 +119,7 @@ export default async function RootLayout(props: Readonly<{ children: React.React
     : { mode: "workspace", userId: currentUserId, workspaceId: currentWorkspaceId };
 
   return (
-    <html lang={locale} dir={RTL_LOCALES.has(locale) ? "rtl" : "ltr"}>
+    <html lang={locale} dir={RTL_LOCALES.has(locale) ? "rtl" : "ltr"} data-theme={theme}>
       <body>
         <I18nProvider locale={locale}>
           <FormatProvider numberFormat={numberFormat} dateFormat={dateFormat}>
@@ -134,6 +139,8 @@ export default async function RootLayout(props: Readonly<{ children: React.React
                         <TabBar />
                         <div className="topbar-actions">
                           <CurrencySelector initialCurrency={reportingCurrency} titleText={t(locale, "currency.title")} />
+                          <LanguageToggle locale={locale} />
+                          <ThemeToggle initialTheme={theme} locale={locale} />
                           <ModeToggle isDemoMode={demo} />
                           <AccountMenu
                             authEnabled={authEnabled}

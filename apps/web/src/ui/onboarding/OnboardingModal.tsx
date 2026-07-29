@@ -51,6 +51,8 @@ export function OnboardingModal() {
   // Quick route state (checklist 1.3: nombre + objetivo + moneda, sin mencionar IA)
   const [quickGoal, setQuickGoal] = useState<QuickGoal>("spend");
   const [quickCurrency, setQuickCurrency] = useState<"DOP" | "USD">("DOP");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Guided wizard state
   const [step, setStep] = useState(1);
@@ -65,28 +67,37 @@ export function OnboardingModal() {
     return null;
   }
 
-  const handleQuickFinish = () => {
-    completeOnboarding(
-      {
+  const handleQuickFinish = async (): Promise<void> => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await completeOnboarding(
+        {
         userName: userName.trim() || "Usuario",
         activities: ["employee"],
         assistanceMode: "eventual",
-      },
-      "quick"
-    );
-    fetchWithCsrf("/api/workspace-settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reportingCurrency: quickCurrency }),
-    }).catch(() => {
-      // Currency defaults server-side if this fails; not worth blocking onboarding
-    });
-    window.location.href = QUICK_GOAL_REDIRECT[quickGoal];
+        },
+        "quick",
+      );
+      const currencyResponse = await fetchWithCsrf("/api/workspace-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reportingCurrency: quickCurrency }),
+      });
+      if (!currencyResponse.ok) throw new Error("Unable to save reporting currency");
+      window.location.assign(QUICK_GOAL_REDIRECT[quickGoal]);
+    } catch {
+      setSubmitError("No pudimos guardar tu configuración. Inténtalo de nuevo.");
+      setIsSubmitting(false);
+    }
   };
 
-  const handleGuidedFinish = () => {
-    completeOnboarding(
-      {
+  const handleGuidedFinish = async (): Promise<void> => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      await completeOnboarding(
+        {
         userName: userName.trim() || "Usuario",
         agentName: agentName.trim() || "Axel",
         agentGender,
@@ -94,9 +105,13 @@ export function OnboardingModal() {
         activities: selectedActivities,
         lifeSituations: selectedSituations,
         assistanceMode,
-      },
-      "guided"
-    );
+        },
+        "guided",
+      );
+    } catch {
+      setSubmitError("No pudimos guardar tu configuración. Inténtalo de nuevo.");
+      setIsSubmitting(false);
+    }
   };
 
   const toggleActivity = (act: EconomicActivity) => {
@@ -205,9 +220,10 @@ export function OnboardingModal() {
               <button className={styles.secondaryBtn} onClick={() => setMode("initial")}>
                 {t("common.back")}
               </button>
-              <button className={styles.primaryBtn} onClick={handleQuickFinish}>
-                {t("onboarding.quick.confirmBtn")}
+              <button className={styles.primaryBtn} onClick={() => { void handleQuickFinish(); }} disabled={isSubmitting}>
+                {isSubmitting ? t("common.saving") : t("onboarding.quick.confirmBtn")}
               </button>
+              {submitError !== null && <p className={styles.error}>{submitError}</p>}
             </div>
           </div>
         )}
@@ -380,12 +396,14 @@ export function OnboardingModal() {
               ) : (
                 <button
                   className={styles.primaryBtn}
-                  onClick={handleGuidedFinish}
+                  onClick={() => { void handleGuidedFinish(); }}
+                  disabled={isSubmitting}
                 >
-                  {t("onboarding.finish")}
+                  {isSubmitting ? t("common.saving") : t("onboarding.finish")}
                 </button>
               )}
             </div>
+            {submitError !== null && <p className={styles.error}>{submitError}</p>}
           </div>
         )}
       </div>

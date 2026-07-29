@@ -62,8 +62,8 @@ table {
 }
 
 th {
-  background: #f8fafc;
-  color: #475569;
+  background: var(--bg-subtle);
+  color: var(--muted);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -82,7 +82,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover td {
-  background: #fafaff;
+  background: var(--bg-subtle);
 }
 
 button:not(:disabled),

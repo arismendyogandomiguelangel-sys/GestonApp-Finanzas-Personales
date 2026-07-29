@@ -1,0 +1,49 @@
+.iconButton,
+.languageButton {
+  align-items: center;
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 750;
+  gap: 6px;
+  height: 32px;
+  justify-content: center;
+  padding: 0 9px;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.iconButton {
+  width: 32px;
+  padding: 0;
+}
+
+.iconButton:hover,
+.languageButton:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.iconButton svg,
+.languageButton svg {
+  fill: none;
+  height: 17px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 17px;
+}
+
+@media (max-width: 520px) {
+  .languageButton span {
+    display: none;
+  }
+
+  .languageButton {
+    width: 32px;
+    padding: 0;
+  }
+}

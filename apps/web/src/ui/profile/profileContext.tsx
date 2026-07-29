@@ -108,7 +108,7 @@ const toServerFields = (updates: Partial<UserProfile>): Record<string, unknown> 
 interface ProfileContextType {
   profile: UserProfile;
   updateProfile: (updates: Partial<UserProfile>) => void;
-  completeOnboarding: (data: Partial<UserProfile>, route: "quick" | "guided") => void;
+  completeOnboarding: (data: Partial<UserProfile>, route: "quick" | "guided") => Promise<void>;
   toggleAiModule: (enabled: boolean) => void;
   hasBusinessFeatures: boolean;
   getAgentDisplayName: () => string;
@@ -178,11 +178,30 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const completeOnboarding = (data: Partial<UserProfile>, route: "quick" | "guided") => {
-    updateProfile({
+  const completeOnboarding = async (data: Partial<UserProfile>, route: "quick" | "guided"): Promise<void> => {
+    const updates: Partial<UserProfile> = {
       ...data,
       onboardingCompleted: true,
       onboardingRoute: route,
+    };
+    const serverFields = toServerFields(updates);
+    const response = await fetchWithCsrf("/api/workspace-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(serverFields),
+    });
+    if (!response.ok) {
+      throw new Error("Unable to save onboarding progress");
+    }
+
+    setProfile((prev) => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Ignore storage errors; the server state has already been saved.
+      }
+      return next;
     });
   };
 

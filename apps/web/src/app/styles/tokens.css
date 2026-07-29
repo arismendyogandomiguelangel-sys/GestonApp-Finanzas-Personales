@@ -19,3 +19,21 @@
   --radius-lg: 22px;
   --cursor-pointer: pointer;
 }
+
+[data-theme="dark"] {
+  --bg: #0b1220;
+  --bg-subtle: #111b31;
+  --panel: #111b2e;
+  --panel-raised: #17233a;
+  --panel-border: #2a3a54;
+  --text: #e7edf8;
+  --muted: #9caec8;
+  --accent: #8b82ff;
+  --accent-strong: #b2acff;
+  --accent-soft: #25234d;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 14px 36px rgba(0, 0, 0, 0.3);
+}

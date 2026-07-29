@@ -207,3 +207,10 @@
   gap: 12px;
   margin-block-start: 24px;
 }
+
+.error {
+  color: #fca5a5;
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+}

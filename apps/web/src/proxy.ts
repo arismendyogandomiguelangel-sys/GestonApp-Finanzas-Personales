@@ -155,26 +155,21 @@ const checkCsrf = (request: NextRequest): boolean => {
     return false;
   }
 
-  const allowedOrigin = process.env.CORS_ORIGIN ?? "";
   const secFetchSite = request.headers.get("sec-fetch-site");
   if (secFetchSite === "cross-site") {
     return false;
   }
 
-  if (allowedOrigin === "") {
-    return true;
-  }
-
   const origin = request.headers.get("origin");
   if (origin !== null) {
-    return origin === allowedOrigin;
+    return origin === request.nextUrl.origin;
   }
 
   const referer = request.headers.get("referer");
   if (referer !== null) {
     try {
       const refererOrigin = new URL(referer).origin;
-      return refererOrigin === allowedOrigin;
+      return refererOrigin === request.nextUrl.origin;
     } catch {
       return false;
     }

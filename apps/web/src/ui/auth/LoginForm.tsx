@@ -62,7 +62,7 @@ export const LoginForm = (): ReactElement => {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({})) as { error?: string };
-        setError(body.error ?? "No se pudo iniciar sesión");
+        setError(body.error ?? "No se pudo completar la solicitud. Actualiza la página e inténtalo otra vez.");
         return;
       }
 

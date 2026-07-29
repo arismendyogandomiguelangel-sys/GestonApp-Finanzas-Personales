@@ -51,5 +51,46 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.link-list a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: #fbfcff;
+  color: var(--text);
+  font-weight: 600;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.link-list a:hover {
+  border-color: #c8c3ff;
+  box-shadow: var(--shadow-sm);
+  color: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.homeHero {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(91, 79, 233, 0.12), transparent 36%),
+    var(--panel-raised);
+}
+
+.homeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.homeGrid a {
+  justify-content: space-between;
+}
+
+.homeGrid a span {
+  color: var(--accent);
+  font-size: 18px;
 }

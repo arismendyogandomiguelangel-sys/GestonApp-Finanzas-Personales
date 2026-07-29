@@ -1,7 +1,5 @@
-@layer tokens, reset, base, shell, utilities;
-
-@import "./styles/tokens.css" layer(tokens);
-@import "./styles/reset.css" layer(reset);
-@import "./styles/base.css" layer(base);
-@import "./styles/shell.css" layer(shell);
-@import "./styles/utilities.css" layer(utilities);
+@import "./styles/tokens.css";
+@import "./styles/reset.css";
+@import "./styles/base.css";
+@import "./styles/shell.css";
+@import "./styles/utilities.css";

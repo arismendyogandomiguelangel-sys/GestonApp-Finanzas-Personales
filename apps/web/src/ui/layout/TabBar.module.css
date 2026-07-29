@@ -1,11 +1,11 @@
 .tabBarContainer {
-  background-color: var(--bg-surface, #1e293b);
-  border-block-end: 1px solid var(--border-color, #334155);
-  padding-inline-start: 24px;
-  padding-inline-end: 24px;
+  background: transparent;
+  border-block-end: 0;
+  padding-inline-start: 0;
+  padding-inline-end: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -17,23 +17,26 @@
 .tabItem {
   display: inline-flex;
   align-items: center;
-  padding-block: 12px;
-  padding-inline: 16px;
-  color: #94a3b8;
+  padding-block: 8px;
+  padding-inline: 12px;
+  color: var(--muted);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  border-block-end: 2px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
   white-space: nowrap;
   transition: color 150ms ease, border-color 150ms ease;
 }
 
 .tabItem:hover {
-  color: #f1f5f9;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
 }
 
 .tabItemActive {
-  color: #818cf8;
+  color: var(--accent-strong);
   font-weight: 600;
-  border-block-end-color: #6366f1;
+  border-color: #dcd8ff;
+  background: var(--accent-soft);
 }

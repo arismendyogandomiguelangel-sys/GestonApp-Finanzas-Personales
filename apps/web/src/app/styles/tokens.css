@@ -1,9 +1,21 @@
 :root {
-  --bg: #ffffff;
+  --bg: #f5f7fb;
+  --bg-subtle: #eef2ff;
   --panel: #ffffff;
-  --panel-border: #232323;
-  --text: #000000;
-  --muted: #898989;
-  --accent: #232323;
+  --panel-raised: #ffffff;
+  --panel-border: #e2e8f0;
+  --text: #172033;
+  --muted: #64748b;
+  --accent: #5b4fe9;
+  --accent-strong: #4338ca;
+  --accent-soft: #eeecff;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
   --cursor-pointer: pointer;
 }

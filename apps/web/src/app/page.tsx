@@ -29,13 +29,16 @@ export default async function HomePage() {
 
   return (
     <main className="container">
-      <section className="panel">
+      <section className="panel homeHero">
         <h1 className="title">{t(locale, "brand.full")}</h1>
-        <ul className="link-list">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}><Link href={link.href}>{t(locale, link.labelKey)}</Link></li>
-          ))}
-        </ul>
+        <p className="subtitle">{t(locale, "nav.home")}</p>
+        <nav aria-label={t(locale, "nav.home")}>
+          <ul className="link-list homeGrid">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}><Link href={link.href}>{t(locale, link.labelKey)}<span aria-hidden="true">→</span></Link></li>
+            ))}
+          </ul>
+        </nav>
       </section>
     </main>
   );

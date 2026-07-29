@@ -66,6 +66,10 @@ Open-source expense and budget tracker: expenses, budgets, balances, transfers, 
 
 Cloudflare credentials are stored locally in `scripts/cloudflare/.env` (gitignored). Scripts in `scripts/cloudflare/` manage DNS, SSL, and cache rules via the Cloudflare API.
 
+## GitHub and Vercel Publishing
+
+For this project, publish every user-requested code or configuration change to GitHub after validation. Vercel is the only production deployment platform and must receive deployments from the GitHub repository; do not use or configure AWS deployment workflows.
+
 ## AWS Deployment
 
 Before querying AWS resources:

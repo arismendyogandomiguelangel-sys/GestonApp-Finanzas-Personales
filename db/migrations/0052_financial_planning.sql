@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS savings_goals (
   id text PRIMARY KEY DEFAULT ('goal_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   name text NOT NULL,
   target_amount numeric(14,2) NOT NULL,
   current_amount numeric(14,2) NOT NULL DEFAULT 0.00,
@@ -20,7 +20,7 @@ CREATE POLICY savings_goals_workspace_policy ON savings_goals
 
 CREATE TABLE IF NOT EXISTS financial_events (
   id text PRIMARY KEY DEFAULT ('event_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   name text NOT NULL,
   event_type text NOT NULL, -- wedding, travel, car, housing, pregnancy, custom
   estimated_budget numeric(14,2) NOT NULL,
@@ -37,7 +37,7 @@ CREATE POLICY financial_events_workspace_policy ON financial_events
 
 CREATE TABLE IF NOT EXISTS recurring_expenses (
   id text PRIMARY KEY DEFAULT ('rec_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   name text NOT NULL,
   amount numeric(14,2) NOT NULL,
   frequency text NOT NULL DEFAULT 'monthly', -- monthly, biweekly, weekly, annual

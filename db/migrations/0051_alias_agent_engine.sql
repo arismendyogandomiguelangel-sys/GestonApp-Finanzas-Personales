@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS agent_learning_queue (
   id text PRIMARY KEY DEFAULT ('learn_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   question text NOT NULL,
   context_data jsonb DEFAULT '{}'::jsonb,
   priority integer DEFAULT 1,
@@ -19,7 +19,7 @@ CREATE POLICY agent_learning_queue_workspace_policy ON agent_learning_queue
 
 CREATE TABLE IF NOT EXISTS agent_behavior_rules (
   id text PRIMARY KEY DEFAULT ('rule_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   rule_type text NOT NULL, -- sunday_planning, silent_register, pre_billing, goal_alert
   enabled boolean NOT NULL DEFAULT true,
   config jsonb DEFAULT '{}'::jsonb,

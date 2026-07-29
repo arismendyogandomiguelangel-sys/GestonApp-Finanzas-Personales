@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS dashboard_templates (
   id text PRIMARY KEY DEFAULT ('tmpl_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   name text NOT NULL,
   tag text NOT NULL DEFAULT 'Personal', -- DGII, Banco, Financiera, Personal, Custom
   widgets_json jsonb DEFAULT '[]'::jsonb,
@@ -18,7 +18,7 @@ CREATE POLICY dashboard_templates_workspace_policy ON dashboard_templates
 
 CREATE TABLE IF NOT EXISTS vouchers_ocr (
   id text PRIMARY KEY DEFAULT ('vouch_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   image_url text,
   rnc_issuer text,
   issuer_name text,
@@ -38,7 +38,7 @@ CREATE POLICY vouchers_ocr_workspace_policy ON vouchers_ocr
 
 CREATE TABLE IF NOT EXISTS export_history (
   id text PRIMARY KEY DEFAULT ('exp_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   file_type text NOT NULL, -- 606_txt, 607_txt, 608_txt, pdf_report, excel_xlsx, csv
   period text NOT NULL,
   record_count integer DEFAULT 0,

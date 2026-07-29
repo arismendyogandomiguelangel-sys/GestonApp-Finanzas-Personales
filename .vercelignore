@@ -1,0 +1,14 @@
+.dev
+.agents
+.codex
+.github
+.insforge
+docs
+infra
+scripts
+apps/web/e2e
+apps/web/e2e-local
+apps/web/test-results
+apps/web/playwright-report
+**/*.test.ts
+**/*.test.tsx

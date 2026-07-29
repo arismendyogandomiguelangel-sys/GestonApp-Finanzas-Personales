@@ -1,0 +1,126 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: hsl(220 20% 97%);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 360px;
+  padding: 32px;
+  border: 1px solid hsl(220 14% 89%);
+  border-radius: 12px;
+  background: hsl(0 0% 100%);
+  box-shadow: 0 1px 3px hsl(220 20% 20% / 8%);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: hsl(220 25% 15%);
+}
+
+.subtitle {
+  margin: 4px 0 24px;
+  font-size: 14px;
+  color: hsl(220 10% 45%);
+}
+
+.label {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(220 20% 25%);
+}
+
+.input {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid hsl(220 14% 85%);
+  border-radius: 8px;
+  font-size: 14px;
+  color: hsl(220 25% 15%);
+  background: hsl(0 0% 100%);
+}
+
+.passwordField {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.passwordInput {
+  width: 100%;
+  margin-bottom: 0;
+  padding-inline-end: 44px;
+}
+
+.passwordToggle {
+  position: absolute;
+  inset-inline-end: 4px;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: hsl(220 10% 45%);
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.passwordToggle:hover {
+  color: hsl(217 91% 44%);
+  background: hsl(217 91% 96%);
+}
+
+.passwordToggle:focus-visible {
+  outline: 2px solid hsl(217 91% 60%);
+  outline-offset: 1px;
+}
+
+.passwordToggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.input:focus {
+  outline: 2px solid hsl(217 91% 60%);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.error {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: hsl(0 72% 42%);
+}
+
+.button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(0 0% 100%);
+  background: hsl(217 91% 50%);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: hsl(217 91% 44%);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

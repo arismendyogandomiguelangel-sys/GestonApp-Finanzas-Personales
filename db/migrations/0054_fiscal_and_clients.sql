@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS rnc_profiles (
   id text PRIMARY KEY DEFAULT ('rnc_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   rnc_number text NOT NULL,
   business_name text NOT NULL,
   trade_name text,
@@ -19,7 +19,7 @@ CREATE POLICY rnc_profiles_workspace_policy ON rnc_profiles
 
 CREATE TABLE IF NOT EXISTS isr_deductibles (
   id text PRIMARY KEY DEFAULT ('ded_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   category_name text NOT NULL,
   deductible_percentage numeric(5,2) NOT NULL DEFAULT 100.00,
   description text,
@@ -33,7 +33,7 @@ CREATE POLICY isr_deductibles_workspace_policy ON isr_deductibles
 
 CREATE TABLE IF NOT EXISTS clients_directory (
   id text PRIMARY KEY DEFAULT ('cli_' || md5(random()::text || clock_timestamp()::text)),
-  workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+  workspace_id text NOT NULL REFERENCES workspaces(workspace_id) ON DELETE CASCADE,
   name text NOT NULL,
   rnc_cedula text,
   phone text,

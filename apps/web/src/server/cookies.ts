@@ -3,7 +3,7 @@
  * Appends Set-Cookie headers that expire both cookies immediately.
  */
 
-const AUTH_COOKIE_NAMES: ReadonlyArray<string> = ["session", "refresh"];
+const AUTH_COOKIE_NAMES: ReadonlyArray<string> = ["session", "refresh", "insforge_csrf"];
 const APP_CSRF_COOKIE_NAME = "__Host-csrf";
 
 export const clearAuthCookies = (headers: Headers): void => {

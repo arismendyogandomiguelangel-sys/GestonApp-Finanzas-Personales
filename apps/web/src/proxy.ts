@@ -20,6 +20,12 @@ import { log } from "@/server/logger";
 import { clearAuthCookies } from "@/server/cookies";
 import { LOCAL_USER_EMAIL } from "@/server/users";
 import { getConfiguredAuthMode, type AuthMode } from "@/server/authMode";
+import {
+  verifyInsforgeToken,
+  refreshInsforgeSession,
+  InsforgeTokenExpiredError,
+  type InsforgeSession,
+} from "@/server/insforgeAuth";
 import { ACTIVE_WORKSPACE_RELOAD_MESSAGE } from "@/server/workspaceErrors";
 
 const LOCAL_USER_ID = "local";
@@ -34,6 +40,8 @@ const CSRF_HEADER_NAME = "x-csrf-token";
 const WORKSPACE_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const CSRF_TOKEN_RE = /^[0-9a-f]{64}$/;
 const WORKSPACE_BOOTSTRAP_PATH = "/api/workspaces/bootstrap";
+const LOGIN_PATH = "/login";
+const INSFORGE_AUTH_API_PREFIX = "/api/auth/insforge/";
 
 const PUBLIC_PATHS: ReadonlyArray<string> = [
   "/api/auth/logout",
@@ -226,6 +234,31 @@ export const isPublicPath = (pathname: string): boolean =>
   PUBLIC_PATHS.includes(pathname)
   || PUBLIC_PATH_PATTERNS.some((pattern: RegExp): boolean => pattern.test(pathname));
 
+/**
+ * Forward a request that carries no authenticated identity, stripping any
+ * client-supplied identity headers so they can never be spoofed downstream.
+ */
+const forwardWithoutIdentity = (
+  request: NextRequest,
+  nonce: string,
+  includeRequestPath: boolean,
+): NextResponse => {
+  const csp = buildCsp(nonce);
+  const headers = new Headers(request.headers);
+  headers.delete(USER_ID_HEADER);
+  headers.delete(WORKSPACE_ID_HEADER);
+  headers.delete(USER_EMAIL_HEADER);
+  headers.delete(USER_EMAIL_VERIFIED_HEADER);
+  if (includeRequestPath) {
+    headers.set(REQUEST_PATH_HEADER, request.nextUrl.pathname + request.nextUrl.search);
+  }
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", csp);
+  const response = NextResponse.next({ request: { headers } });
+  addSecurityHeaders(response, nonce, csp);
+  return response;
+};
+
 export const resolveWorkspaceIdFromCookie = (workspaceCookie: string | undefined): string | null =>
   (workspaceCookie !== undefined && workspaceCookie !== "" && WORKSPACE_ID_RE.test(workspaceCookie))
     ? workspaceCookie
@@ -283,6 +316,107 @@ const handleMissingWorkspaceCookie = (
   return response;
 };
 
+const buildLoginRedirectUrl = (request: NextRequest): URL => {
+  const url = new URL(LOGIN_PATH, request.url);
+  const returnPath = request.nextUrl.pathname + request.nextUrl.search;
+  if (returnPath !== "/") {
+    url.searchParams.set("returnTo", returnPath);
+  }
+  return url;
+};
+
+const redirectToLogin = (request: NextRequest, nonce: string): NextResponse => {
+  const response = NextResponse.redirect(buildLoginRedirectUrl(request));
+  clearAuthCookies(response.headers);
+  addSecurityHeaders(response, nonce);
+  return response;
+};
+
+/**
+ * AUTH_MODE=insforge — the `session` cookie holds an InsForge RS256 JWT.
+ * Verification failures (invalid or expired) send the user back to /login;
+ * InsForge issues a fresh token on sign-in, so there is no inline refresh.
+ */
+const handleInsforgeRequest = async (
+  request: NextRequest,
+  nonce: string,
+  pathname: string,
+): Promise<NextResponse> => {
+  // The login page and its API must stay reachable without a session. The page
+  // also needs a CSRF cookie, or its own sign-in POST would fail the check above.
+  if (pathname === LOGIN_PATH || pathname.startsWith(INSFORGE_AUTH_API_PREFIX)) {
+    const response = forwardWithoutIdentity(request, nonce, true);
+    maybeAttachCsrfCookie(request, response);
+    return response;
+  }
+
+  if (isPublicPath(pathname)) {
+    return forwardWithoutIdentity(request, nonce, true);
+  }
+
+  if (pathname.startsWith("/api/agent/") && hasApiKeyAuthorization(request.headers.get("authorization"))) {
+    return forwardWithoutIdentity(request, nonce, false);
+  }
+
+  const sessionCookie = request.cookies.get("session")?.value ?? "";
+  if (sessionCookie === "") {
+    return redirectToLogin(request, nonce);
+  }
+
+  let identity: VerifiedIdentity;
+  let renewed: InsforgeSession | undefined;
+
+  try {
+    identity = await verifyInsforgeToken(sessionCookie);
+  } catch (err) {
+    // Access tokens live ~15 min. Refresh inline so a working session is never
+    // interrupted by a login redirect mid-navigation.
+    if (!(err instanceof InsforgeTokenExpiredError)) {
+      const message = err instanceof Error ? err.message : String(err);
+      log({ domain: "auth", action: "proxy_insforge_auth_error", error: message });
+      return redirectToLogin(request, nonce);
+    }
+
+    const refreshCookie = request.cookies.get("refresh")?.value ?? "";
+    const csrfCookie = request.cookies.get("insforge_csrf")?.value ?? "";
+    if (refreshCookie === "" || csrfCookie === "") {
+      return redirectToLogin(request, nonce);
+    }
+
+    try {
+      renewed = await refreshInsforgeSession(refreshCookie, csrfCookie);
+      identity = await verifyInsforgeToken(renewed.accessToken);
+    } catch (refreshErr) {
+      const message = refreshErr instanceof Error ? refreshErr.message : String(refreshErr);
+      log({ domain: "auth", action: "proxy_insforge_refresh_failed", error: message });
+      return redirectToLogin(request, nonce);
+    }
+  }
+
+  const attachRenewedSession = (response: NextResponse): NextResponse => {
+    if (renewed === undefined) return response;
+    for (const [name, value] of [
+      ["session", renewed.accessToken],
+      ["refresh", renewed.refreshToken],
+      ["insforge_csrf", renewed.csrfToken],
+    ] as ReadonlyArray<readonly [string, string]>) {
+      response.headers.append("Set-Cookie", buildCookieHeader(name, value, 604800));
+    }
+    return response;
+  };
+
+  if (pathname === WORKSPACE_BOOTSTRAP_PATH) {
+    return attachRenewedSession(forwardWithIdentity(request, identity, null, nonce));
+  }
+
+  const workspaceId = resolveWorkspaceId(request);
+  if (workspaceId === null) {
+    return attachRenewedSession(handleMissingWorkspaceCookie(request, nonce));
+  }
+
+  return attachRenewedSession(forwardWithIdentity(request, identity, workspaceId, nonce));
+};
+
 export const proxy = async (request: NextRequest): Promise<NextResponse> => {
   const { pathname } = request.nextUrl;
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -304,34 +438,17 @@ export const proxy = async (request: NextRequest): Promise<NextResponse> => {
     );
   }
 
+  if (authMode === "insforge") {
+    return handleInsforgeRequest(request, nonce, pathname);
+  }
+
   // AUTH_MODE=cognito — public paths are exempt from auth (CSRF already checked above)
   if (isPublicPath(pathname)) {
-    const csp = buildCsp(nonce);
-    const headers = new Headers(request.headers);
-    headers.delete(USER_ID_HEADER);
-    headers.delete(WORKSPACE_ID_HEADER);
-    headers.delete(USER_EMAIL_HEADER);
-    headers.delete(USER_EMAIL_VERIFIED_HEADER);
-    headers.set(REQUEST_PATH_HEADER, request.nextUrl.pathname + request.nextUrl.search);
-    headers.set("x-nonce", nonce);
-    headers.set("Content-Security-Policy", csp);
-    const response = NextResponse.next({ request: { headers } });
-    addSecurityHeaders(response, nonce, csp);
-    return response;
+    return forwardWithoutIdentity(request, nonce, true);
   }
 
   if (pathname.startsWith("/api/agent/") && hasApiKeyAuthorization(request.headers.get("authorization"))) {
-    const csp = buildCsp(nonce);
-    const headers = new Headers(request.headers);
-    headers.delete(USER_ID_HEADER);
-    headers.delete(WORKSPACE_ID_HEADER);
-    headers.delete(USER_EMAIL_HEADER);
-    headers.delete(USER_EMAIL_VERIFIED_HEADER);
-    headers.set("x-nonce", nonce);
-    headers.set("Content-Security-Policy", csp);
-    const response = NextResponse.next({ request: { headers } });
-    addSecurityHeaders(response, nonce, csp);
-    return response;
+    return forwardWithoutIdentity(request, nonce, false);
   }
 
   const sessionCookie = request.cookies.get("session")?.value ?? "";

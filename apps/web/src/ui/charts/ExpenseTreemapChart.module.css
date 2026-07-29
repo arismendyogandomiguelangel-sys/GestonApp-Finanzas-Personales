@@ -1,14 +1,19 @@
 .heading {
-  margin-top: 32px;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
+  margin-top: 28px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 720;
+  color: var(--text);
 }
 
 .wrap {
   position: relative;
   width: 100%;
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel-raised);
+  box-shadow: var(--shadow-sm);
 }
 
 .wrap svg {
@@ -18,7 +23,7 @@
 }
 
 .total {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   margin-bottom: 8px;
@@ -28,9 +33,12 @@
   position: absolute;
   pointer-events: none;
   z-index: 100;
-  background: rgba(20, 20, 20, 0.92);
+  background: rgba(23, 32, 51, 0.96);
   color: #fff;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   font-size: 12px;
   line-height: 1.5;
   max-width: 260px;

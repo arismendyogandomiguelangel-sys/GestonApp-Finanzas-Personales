@@ -49,6 +49,50 @@
   background: hsl(0 0% 100%);
 }
 
+.passwordField {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.passwordInput {
+  width: 100%;
+  margin-bottom: 0;
+  padding-inline-end: 44px;
+}
+
+.passwordToggle {
+  position: absolute;
+  inset-inline-end: 4px;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: hsl(220 10% 45%);
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.passwordToggle:hover {
+  color: hsl(217 91% 44%);
+  background: hsl(217 91% 96%);
+}
+
+.passwordToggle:focus-visible {
+  outline: 2px solid hsl(217 91% 60%);
+  outline-offset: 1px;
+}
+
+.passwordToggle svg {
+  width: 18px;
+  height: 18px;
+}
+
 .input:focus {
   outline: 2px solid hsl(217 91% 60%);
   outline-offset: -1px;

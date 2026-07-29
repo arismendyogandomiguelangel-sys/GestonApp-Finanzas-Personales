@@ -191,6 +191,8 @@ type AuthEvent =
   | Readonly<{ domain: "auth"; action: "proxy_insforge_auth_error"; error: string }>
   | Readonly<{ domain: "auth"; action: "proxy_insforge_refresh_failed"; error: string }>
   | Readonly<{ domain: "auth"; action: "insforge_sign_in_rejected"; error: string }>
+  | Readonly<{ domain: "auth"; action: "insforge_registration_rejected"; error: string }>
+  | Readonly<{ domain: "auth"; action: "insforge_email_verification_rejected"; error: string }>
   | Readonly<{ domain: "auth"; action: "error"; error: string }>;
 
 type LogEvent = ChatEvent | ChatTranscriptionEvent | ApiEvent | SqlApiEvent | AuthEvent;

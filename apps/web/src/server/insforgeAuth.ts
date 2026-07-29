@@ -76,6 +76,10 @@ export type InsforgeSession = Readonly<{
   csrfToken: string;
 }>;
 
+export type InsforgeRegistration = Readonly<{
+  requiresEmailVerification: boolean;
+}>;
+
 const getAnonKey = (): string => {
   const anonKey = process.env.INSFORGE_ANON_KEY ?? "";
   if (anonKey === "") throw new Error("INSFORGE_ANON_KEY is not configured");
@@ -132,6 +136,51 @@ export const signInWithPassword = async (
   if (!response.ok) {
     const body = await response.json().catch(() => ({})) as Record<string, unknown>;
     const message = typeof body.message === "string" ? body.message : "Sign-in failed";
+    throw new InsforgeSignInError(message, response.status);
+  }
+
+  return readSession(response);
+};
+
+export const registerWithPassword = async (
+  email: string,
+  password: string,
+): Promise<InsforgeRegistration> => {
+  const response = await fetch(`${getBaseUrl()}/api/auth/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getAnonKey()}`,
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+    const message = typeof body.message === "string" ? body.message : "Registration failed";
+    throw new InsforgeSignInError(message, response.status);
+  }
+
+  const body = await response.json() as Record<string, unknown>;
+  return { requiresEmailVerification: body.requireEmailVerification === true };
+};
+
+export const verifyEmailCode = async (
+  email: string,
+  otp: string,
+): Promise<InsforgeSession> => {
+  const response = await fetch(`${getBaseUrl()}/api/auth/email/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getAnonKey()}`,
+    },
+    body: JSON.stringify({ email, otp }),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+    const message = typeof body.message === "string" ? body.message : "Email verification failed";
     throw new InsforgeSignInError(message, response.status);
   }
 

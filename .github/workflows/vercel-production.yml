@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   deploy:
-    if: ${{ secrets.VERCEL_TOKEN != '' && vars.VERCEL_ORG_ID != '' && vars.VERCEL_PROJECT_ID != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -24,17 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.0
 
-      - name: Validate Vercel deployment credentials
+      - id: configuration
+        name: Check Vercel deployment configuration
         run: |
-          test -n "$VERCEL_TOKEN" || { echo "Missing repository secret VERCEL_TOKEN"; exit 1; }
-          test -n "$VERCEL_ORG_ID" || { echo "Missing repository variable VERCEL_ORG_ID"; exit 1; }
-          test -n "$VERCEL_PROJECT_ID" || { echo "Missing repository variable VERCEL_PROJECT_ID"; exit 1; }
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Vercel deployment skipped until VERCEL_TOKEN is configured as a repository secret."
+            exit 0
+          fi
+          echo "configured=true" >> "$GITHUB_OUTPUT"
 
       - name: Pull Vercel production configuration
+        if: steps.configuration.outputs.configured == 'true'
         run: npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Build production artifact
+        if: steps.configuration.outputs.configured == 'true'
         run: npx vercel build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy production artifact
+        if: steps.configuration.outputs.configured == 'true'
         run: npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

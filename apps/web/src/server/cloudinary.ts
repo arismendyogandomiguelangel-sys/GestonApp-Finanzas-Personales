@@ -25,21 +25,44 @@ type CloudinaryConfig = Readonly<{
   apiSecret: string;
 }>;
 
-export const isCloudinaryConfigured = (): boolean =>
-  (process.env.CLOUDINARY_CLOUD_NAME ?? "") !== ""
-  && (process.env.CLOUDINARY_API_KEY ?? "") !== ""
-  && (process.env.CLOUDINARY_API_SECRET ?? "") !== "";
+const getConfigFromUrl = (): CloudinaryConfig | null => {
+  const rawUrl = process.env.CLOUDINARY_URL ?? "";
+  if (rawUrl === "") return null;
 
-const getConfig = (): CloudinaryConfig => {
+  try {
+    const parsed = new URL(rawUrl);
+    const cloudName = parsed.hostname;
+    const apiKey = decodeURIComponent(parsed.username);
+    const apiSecret = decodeURIComponent(parsed.password);
+    if (parsed.protocol !== "cloudinary:" || cloudName === "" || apiKey === "" || apiSecret === "") {
+      return null;
+    }
+    return { cloudName, apiKey, apiSecret };
+  } catch {
+    return null;
+  }
+};
+
+const getOptionalConfig = (): CloudinaryConfig | null => {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME ?? "";
   const apiKey = process.env.CLOUDINARY_API_KEY ?? "";
   const apiSecret = process.env.CLOUDINARY_API_SECRET ?? "";
-  if (cloudName === "" || apiKey === "" || apiSecret === "") {
+  if (cloudName !== "" && apiKey !== "" && apiSecret !== "") {
+    return { cloudName, apiKey, apiSecret };
+  }
+  return getConfigFromUrl();
+};
+
+export const isCloudinaryConfigured = (): boolean => getOptionalConfig() !== null;
+
+const getConfig = (): CloudinaryConfig => {
+  const config = getOptionalConfig();
+  if (config === null) {
     throw new Error(
-      "Cloudinary is not configured: set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET",
+      "Cloudinary is not configured: set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET",
     );
   }
-  return { cloudName, apiKey, apiSecret };
+  return config;
 };
 
 /**
@@ -74,13 +97,13 @@ export const createVoucherUploadSignature = (workspaceId: string): CloudinarySig
  * caller cannot persist an arbitrary external URL as a voucher image.
  */
 export const isOwnCloudinaryUrl = (url: string): boolean => {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME ?? "";
-  if (cloudName === "") return false;
+  const config = getOptionalConfig();
+  if (config === null) return false;
   try {
     const parsed = new URL(url);
     return parsed.protocol === "https:"
       && parsed.hostname === "res.cloudinary.com"
-      && parsed.pathname.startsWith(`/${cloudName}/`);
+      && parsed.pathname.startsWith(`/${config.cloudName}/`);
   } catch {
     return false;
   }

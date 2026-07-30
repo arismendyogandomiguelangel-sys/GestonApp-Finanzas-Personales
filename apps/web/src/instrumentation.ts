@@ -14,6 +14,7 @@
  */
 import { getAuthModeValidationErrors } from "@/server/authMode";
 import { createLangfuseSpanProcessor } from "@/server/chat/openai/langfuse";
+import { isCloudinaryConfigured } from "@/server/cloudinary";
 
 let telemetryStarted = false;
 
@@ -94,6 +95,10 @@ export const register = (): void => {
     if (anonKey === undefined || anonKey === "") {
       errors.push("INSFORGE_ANON_KEY must be set when AUTH_MODE=insforge (required to sign in)");
     }
+  }
+
+  if (!isCloudinaryConfigured()) {
+    errors.push("Cloudinary must be configured with CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET");
   }
 
   if (authMode === "cognito") {

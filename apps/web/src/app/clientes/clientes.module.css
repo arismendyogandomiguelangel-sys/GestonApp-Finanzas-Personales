@@ -1,0 +1,201 @@
+.clientesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.metricCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+}
+
+.metricCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricLabel {
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metricIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.metricValue {
+  font-size: 1.85rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.metricSub {
+  font-size: 12.5px;
+  color: var(--success);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Nav Cards to Subpages */
+.subnavGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.subnavCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all var(--transition-smooth);
+}
+
+.subnavCard:hover {
+  border-color: var(--accent);
+  background: var(--bg-subtle);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.subnavTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subnavDesc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.clientCard {
+  background: var(--bg-subtle);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+}
+
+.clientCard:hover {
+  border-color: var(--border-subtle);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.clientHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.clientName {
+  font-size: 1.18rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0;
+}
+
+.clientRnc {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 700;
+  display: inline-block;
+  margin-block-start: 4px;
+}
+
+.clientBadge {
+  background: hsl(158, 76%, 45%, 0.15);
+  color: var(--success);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 750;
+  border: 1px solid hsl(158, 76%, 45%, 0.3);
+}
+
+.clientContact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--muted);
+  border-block-start: 1px solid var(--panel-border);
+  padding-block-start: 14px;
+}
+
+.clientFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-block-start: 1px solid var(--panel-border);
+  padding-block-start: 14px;
+  font-size: 14px;
+}
+
+.btnAction {
+  background: var(--agent-gradient);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 10px 22px;
+  font-size: 13.5px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--agent-glow);
+  transition: all var(--transition-smooth);
+}
+
+.btnAction:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}

@@ -196,9 +196,10 @@ export const getFxBreakdown = async (userId: string, workspaceId: string, month:
     getReportCurrency(userId, workspaceId),
     getLatestFxCalendarDate(),
   ]);
-  const result = await queryAs(userId, workspaceId, QUERY, [reportCurrency, month, latestFxCalendarDate]);
-  const openValuationDate = getValuationDate(offsetMonth(month, -1), latestFxCalendarDate);
-  const closeValuationDate = getValuationDate(month, latestFxCalendarDate);
+  const valuationDate = latestFxCalendarDate ?? new Date().toISOString().slice(0, 10);
+  const result = await queryAs(userId, workspaceId, QUERY, [reportCurrency, month, valuationDate]);
+  const openValuationDate = getValuationDate(offsetMonth(month, -1), valuationDate);
+  const closeValuationDate = getValuationDate(month, valuationDate);
   return {
     openValuationDate,
     closeValuationDate,

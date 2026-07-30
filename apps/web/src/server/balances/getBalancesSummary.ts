@@ -206,12 +206,16 @@ export const getBalancesSummary = async (userId: string, workspaceId: string): P
     getReportCurrency(userId, workspaceId),
     getLatestFxCalendarDate(),
   ]);
+  // Keep the balances page available while the global FX calendar is empty.
+  // Native balances and the reporting currency remain accurate; other
+  // currencies are explicitly returned as conversion warnings.
+  const valuationDate = latestFxCalendarDate ?? new Date().toISOString().slice(0, 10);
 
   return withUserContext(userId, workspaceId, async (q) => {
     const [accountResult, totalResult, warningResult, stalenessResult, metadataResult] = await Promise.all([
-      q(ACCOUNTS_QUERY, [reportCurrency, latestFxCalendarDate]),
-      q(TOTALS_QUERY, [reportCurrency, latestFxCalendarDate]),
-      q(WARNINGS_QUERY, [reportCurrency, latestFxCalendarDate]),
+      q(ACCOUNTS_QUERY, [reportCurrency, valuationDate]),
+      q(TOTALS_QUERY, [reportCurrency, valuationDate]),
+      q(WARNINGS_QUERY, [reportCurrency, valuationDate]),
       q(STALENESS_QUERY, []),
       q(METADATA_QUERY, [ACCOUNT_METADATA_DEFAULT_ACCOUNT_TYPE, ACCOUNT_METADATA_DEFAULT_GROUP]),
     ]);

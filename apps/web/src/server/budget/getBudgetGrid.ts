@@ -368,6 +368,10 @@ export const getBudgetGrid = async (userId: string, workspaceId: string, monthFr
     getReportCurrency(userId, workspaceId),
     getLatestFxCalendarDate(),
   ]);
+  // A newly created workspace can have no imported FX calendar yet. Read
+  // report-currency amounts normally and surface other currencies as warnings
+  // instead of preventing the financial workspace from opening.
+  const valuationDate = latestFxCalendarDate ?? new Date().toISOString().slice(0, 10);
 
   // Each queryAs acquires its own connection from the pool and sets RLS context
   // independently, so Promise.all runs all 4 queries on separate connections
@@ -385,7 +389,7 @@ export const getBudgetGrid = async (userId: string, workspaceId: string, monthFr
     queryAs(userId, workspaceId, QUERY, [reportCurrency, monthFrom, monthTo, planFrom, actualTo]),
     queryAs(userId, workspaceId, WARNINGS_QUERY, [reportCurrency]),
     queryAs(userId, workspaceId, CUMULATIVE_BALANCE_QUERY, [reportCurrency, monthFrom]),
-    queryAs(userId, workspaceId, MONTH_END_BALANCES_QUERY, [reportCurrency, monthFrom, actualTo, latestFxCalendarDate]),
+    queryAs(userId, workspaceId, MONTH_END_BALANCES_QUERY, [reportCurrency, monthFrom, actualTo, valuationDate]),
     queryAs(userId, workspaceId, BUSINESS_PERSONAL_TRANSFER_QUERY, [reportCurrency, monthFrom, monthTo, actualTo]),
     queryAs(userId, workspaceId, HAS_BUSINESS_ACCOUNT_QUERY, []),
   ]);

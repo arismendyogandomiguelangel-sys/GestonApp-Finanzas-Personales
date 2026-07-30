@@ -14,6 +14,14 @@ yarn.lock
 # Environment
 **/.env
 **/.env.local
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+credentials.json
+service-account.json
+secrets/
 
 # CDK local/cached context (account-specific, auto-generated)
 cdk.context.local.json

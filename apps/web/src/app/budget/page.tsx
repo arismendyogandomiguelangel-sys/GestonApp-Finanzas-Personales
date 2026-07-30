@@ -14,6 +14,7 @@ import { getUserSettings } from "@/server/userSettings";
 import { getDemoBudgetGrid, getDemoFieldHints } from "@/server/demo/data";
 import { BudgetTable } from "@/ui/tables/budget/BudgetTable";
 import { LoadingIndicator } from "@/ui/LoadingIndicator";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
 
 export const dynamic = "force-dynamic";
 
@@ -115,7 +116,12 @@ export default async function BudgetDashboardPage() {
   return (
     <main className="container">
       <section className="panel">
-        <h1 className="title">{t(locale, "nav.budget")}</h1>
+        <ModuleHeaderIHA
+          title={t(locale, "nav.budget")}
+          categoryCode="C"
+          categoryLabel="Presupuesto, control y decisiones"
+          description="Planifica tu mes por categoría usando monto base y modificadores. Añade notas de decisión para mantener tu contexto claro."
+        />
 
         <Suspense fallback={<LoadingIndicator />}>
           <BudgetData />

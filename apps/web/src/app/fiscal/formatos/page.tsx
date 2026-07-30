@@ -1,27 +1,64 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
+import styles from "../fiscal.module.css";
 
 export default function FiscalFormatosPage() {
   return (
-    <div style={{ padding: "24px", maxWidth: "900px", margin: "0 auto", color: "#f8fafc" }}>
-      <h1 style={{ fontSize: "1.75rem", fontWeight: "700", marginBottom: "8px" }}>📊 Formatos Tributarios (606 / 607 / 608 / IT-1)</h1>
-      <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
-        Generación directa de declaraciones mensuales y formatos de envío.
-      </p>
+    <main className="container">
+      <section className="panel">
+        <ModuleHeaderIHA
+          title="📑 Generador de Formatos DGII (606 / 607 / 608 / IT-1)"
+          categoryCode="F"
+          categoryLabel="Fiscalidad DGII · Exportador Oficial"
+          description="Consolida automáticamente compras, ventas y comprobantes anulados registrados en la base de datos InsForge para generar los archivos de envío a la Oficina Virtual."
+          agentContextLabel="Formatos 606/607/IT-1 · Listos para Declarar"
+        />
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
-        <div style={{ backgroundColor: "#1e293b", border: "1px solid #334155", borderRadius: "12px", padding: "20px" }}>
-          <h3 style={{ margin: "0 0 8px" }}>Formato 606</h3>
-          <p style={{ color: "#94a3b8", fontSize: "0.85rem" }}>Compras de Bienes y Servicios.</p>
-          <a href="/vouchers/dgii" style={{ color: "#818cf8", fontWeight: "600", textDecoration: "none" }}>Generar 606 →</a>
+        <div className={styles.subnavGrid} style={{ marginBlockStart: "24px" }}>
+          <Link href="/vouchers/dgii" className={styles.subnavCard}>
+            <div className={styles.subnavTitle}>
+              <span>🧾 Formato 606 (Compras e ITBIS)</span>
+              <span style={{ color: "var(--accent)" }}>→</span>
+            </div>
+            <p className={styles.subnavDesc}>
+              Reporte de compras de bienes y servicios con NCF de crédito fiscal y retenciones de ITBIS o ISR.
+            </p>
+          </Link>
+
+          <Link href="/vouchers/dgii" className={styles.subnavCard}>
+            <div className={styles.subnavTitle}>
+              <span>🏷️ Formato 607 (Ventas e Ingresos)</span>
+              <span style={{ color: "var(--success)" }}>→</span>
+            </div>
+            <p className={styles.subnavDesc}>
+              Reporte de facturación por tus 4 canales de ingreso (Iguala fija, Tienda Online, YouTube y Honorarios).
+            </p>
+          </Link>
+
+          <div className={styles.subnavCard} style={{ cursor: "default" }}>
+            <div className={styles.subnavTitle}>
+              <span>❌ Formato 608 (Comprobantes Anulados)</span>
+              <span style={{ color: "var(--muted)" }}>0</span>
+            </div>
+            <p className={styles.subnavDesc}>
+              Registro de NCF no utilizados o anulados por error en digitación o devolución de clientes.
+            </p>
+          </div>
+
+          <div className={styles.subnavCard} style={{ cursor: "default" }}>
+            <div className={styles.subnavTitle}>
+              <span>📋 Declaración Jurada IT-1</span>
+              <span style={{ color: "var(--warning)" }}>En curso</span>
+            </div>
+            <p className={styles.subnavDesc}>
+              Liquidación mensual del ITBIS cobrado vs. ITBIS pagado y créditos arrastrados de meses anteriores.
+            </p>
+          </div>
         </div>
-        <div style={{ backgroundColor: "#1e293b", border: "1px solid #334155", borderRadius: "12px", padding: "20px" }}>
-          <h3 style={{ margin: "0 0 8px" }}>Formato 607</h3>
-          <p style={{ color: "#94a3b8", fontSize: "0.85rem" }}>Ventas de Bienes y Servicios.</p>
-          <a href="/vouchers/dgii" style={{ color: "#10b981", fontWeight: "600", textDecoration: "none" }}>Generar 607 →</a>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

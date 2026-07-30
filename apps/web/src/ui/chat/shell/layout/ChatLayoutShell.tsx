@@ -58,7 +58,6 @@ export const ChatLayoutShell = (props: Props): ReactElement => {
       <div className={cn(styles.mainContent, !isFullscreenChat && styles.mainContentWithChatClearance)}>
         {children}
       </div>
-      {!isFullscreenChat && !isOpen && <ChatToggle />}
     </div>
   );
 };

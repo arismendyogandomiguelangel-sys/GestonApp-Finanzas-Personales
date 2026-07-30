@@ -11,6 +11,7 @@ import { getUserSettings } from "@/server/userSettings";
 import { getDemoFieldHints, getDemoTransactionsFilterOptions } from "@/server/demo/data";
 import { TransactionsRawTable } from "@/ui/tables/transactions/TransactionsRawTable";
 import { LoadingIndicator } from "@/ui/LoadingIndicator";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +59,12 @@ export default async function TransactionsDashboardPage() {
   return (
     <main className="container">
       <section className="panel">
-        <h1 className="title">{t(locale, "nav.transactions")}</h1>
+        <ModuleHeaderIHA
+          title={t(locale, "nav.transactions")}
+          categoryCode="B"
+          categoryLabel="Registro financiero diario"
+          description="Registra ingresos, gastos y transferencias. Axelin propone clasificaciones y notas, preservando tu control y privacidad por espacio."
+        />
 
         <Suspense fallback={<LoadingIndicator />}>
           <TransactionsData />

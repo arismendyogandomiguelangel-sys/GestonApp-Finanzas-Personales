@@ -1,0 +1,238 @@
+.vouchersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.metricsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.metricCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+}
+
+.metricCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricLabel {
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metricIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.metricValue {
+  font-size: 1.85rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.metricSub {
+  font-size: 12.5px;
+  color: var(--success);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Dropzone Moderno OCR */
+.dropzoneBox {
+  background: var(--panel-raised);
+  border: 2px dashed var(--accent-soft);
+  border-radius: var(--radius-xl);
+  padding: 44px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: all var(--transition-smooth);
+  cursor: pointer;
+}
+
+.dropzoneBox:hover {
+  border-color: var(--accent);
+  background: var(--bg-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.dropIconBox {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  background: var(--agent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 26px;
+  box-shadow: 0 6px 20px var(--agent-glow);
+}
+
+.dropTitle {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.dropSub {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ocrButton {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 4px 16px var(--accent-glow);
+  transition: all var(--transition-smooth);
+}
+
+.ocrButton:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+.ocrButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tarjeta del Voucher Procesado / Extracción DGII */
+.resultPanel {
+  background: var(--panel-raised);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: 0 8px 30px var(--agent-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-block-end: 1px solid var(--panel-border);
+  padding-block-end: 18px;
+}
+
+.resultTitle {
+  font-size: 1.25rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dgiiTag {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: hsl(158, 76%, 45%, 0.15);
+  color: var(--success);
+  font-size: 13px;
+  font-weight: 750;
+  border: 1px solid hsl(158, 76%, 45%, 0.3);
+}
+
+.dataGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.dataItem {
+  background: var(--bg-subtle);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dataLabel {
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.dataValue {
+  font-size: 1.1rem;
+  font-weight: 850;
+  color: var(--text);
+}
+
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btnSecondary {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  padding: 11px 22px;
+  border-radius: var(--radius-full);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.btnSecondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--border-subtle);
+}

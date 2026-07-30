@@ -12,6 +12,7 @@ import { getUserSettings } from "@/server/userSettings";
 import { getDemoBalancesSummary } from "@/server/demo/data";
 import { BalancesTable } from "@/ui/tables/balances/BalancesTable";
 import { LoadingIndicator } from "@/ui/LoadingIndicator";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +59,12 @@ export default async function BalancesDashboardPage() {
   return (
     <main className="container">
       <section className="panel">
-        <h1 className="title">{t(locale, "nav.balances")}</h1>
+        <ModuleHeaderIHA
+          title={t(locale, "nav.balances")}
+          categoryCode="D"
+          categoryLabel="Monedas y visión de diáspora"
+          description="Monitorea el saldo real por cuenta en su moneda nativa (DOP, USD, EUR) y consulta la proyección unificada con conversión al tipo de cambio real."
+        />
 
         <Suspense fallback={<LoadingIndicator />}>
           <BalancesData />

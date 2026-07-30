@@ -1,109 +1,82 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useProfile } from "@/ui/profile/profileContext";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
+import styles from "../page.module.css";
+
+const AGENT_AREAS = [
+  {
+    id: "chat",
+    href: "/chat",
+    title: "Chat en Pantalla Completa",
+    desc: "Abre una sesión inmersiva para conversar con tus transacciones, presupuestos y saldos reales en tu idioma.",
+    badge: "E1",
+    icon: "💬",
+  },
+  {
+    id: "memoria",
+    href: "/asistente/memoria",
+    title: "Memoria & Patrones",
+    desc: "Revisa las clasificaciones automáticas aprendidas de tus comercios, RNC y preferencias de cuentas.",
+    badge: "E2",
+    icon: "📚",
+  },
+  {
+    id: "reglas",
+    href: "/asistente/reglas",
+    title: "Reglas de Comportamiento",
+    desc: "Define umbrales de alerta, notificaciones de objetivos y comportamiento proactivo del asistente Axelin.",
+    badge: "E3",
+    icon: "⚙️",
+  },
+  {
+    id: "llm",
+    href: "/asistente/llm",
+    title: "Orquestación Multi-LLM",
+    desc: "Elige entre modelos locales (Ollama), OpenAI, Google Gemini o Antigravity según tus requisitos de privacidad.",
+    badge: "E4",
+    icon: "🤖",
+  },
+];
 
 export default function AsistenteMainPage() {
   const { getAgentDisplayName } = useProfile();
+  const agentName = getAgentDisplayName() || "Axelin";
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1000px", margin: "0 auto", color: "#f8fafc" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-        <div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: "700", margin: 0 }}>
-            🧠 Centro de Control Agéntico — {getAgentDisplayName()}
-          </h1>
-          <p style={{ color: "#94a3b8", marginTop: "4px" }}>
-            Tu asistente financiero personal e inteligencia activa del workspace.
-          </p>
+    <main className="container">
+      <section className="panel">
+        <ModuleHeaderIHA
+          title={`Asistente IA: ${agentName}`}
+          categoryCode="E"
+          categoryLabel="Asistente IA ALIAS / Axelin"
+          description="Una conversación inteligente conectada con tus finanzas personales y empresariales. Axelin organiza, sugiere y explica; tú conservas el control y confirmas cada acción."
+          agentContextLabel="Motor Inteligente Activo · 65% del Objetivo"
+        />
+
+        <div className={styles.categoryGrid}>
+          {AGENT_AREAS.map((area) => (
+            <Link key={area.id} href={area.href} className={styles.categoryCard}>
+              <div className={styles.categoryTop}>
+                <div className={styles.categoryBadgeIcon}>
+                  {area.icon}
+                </div>
+                <div>
+                  <h3 className={styles.categoryTitle}>{area.title}</h3>
+                  <p className={styles.categoryDesc}>{area.desc}</p>
+                </div>
+              </div>
+
+              <div className={styles.categoryFooter}>
+                <span>Sección {area.badge} · Abrir módulo</span>
+                <span className={styles.arrowIcon}>→</span>
+              </div>
+            </Link>
+          ))}
         </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
-        <a
-          href="/chat"
-          style={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "12px",
-            padding: "20px",
-            color: "inherit",
-            textDecoration: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
-        >
-          <div style={{ fontSize: "1.5rem" }}>💬</div>
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Chat Completo con ALIAS</h3>
-          <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.875rem" }}>
-            Conversa en pantalla completa con tus datos financieros.
-          </p>
-        </a>
-
-        <a
-          href="/asistente/memoria"
-          style={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "12px",
-            padding: "20px",
-            color: "inherit",
-            textDecoration: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
-        >
-          <div style={{ fontSize: "1.5rem" }}>📚</div>
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Memoria & Aprendizaje</h3>
-          <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.875rem" }}>
-            Revisa los patrones y reglas que ALIAS ha aprendido sobre ti.
-          </p>
-        </a>
-
-        <a
-          href="/asistente/reglas"
-          style={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "12px",
-            padding: "20px",
-            color: "inherit",
-            textDecoration: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
-        >
-          <div style={{ fontSize: "1.5rem" }}>⚙️</div>
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Reglas de Comportamiento</h3>
-          <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.875rem" }}>
-            Programa la proactividad, alertas y notificaciones del agente.
-          </p>
-        </a>
-
-        <a
-          href="/asistente/llm"
-          style={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
-            borderRadius: "12px",
-            padding: "20px",
-            color: "inherit",
-            textDecoration: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
-        >
-          <div style={{ fontSize: "1.5rem" }}>🤖</div>
-          <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Proveedores Multi-LLM</h3>
-          <p style={{ margin: 0, color: "#94a3b8", fontSize: "0.875rem" }}>
-            Configura Ollama local, Gemini, ChatGPT o Alibaba.
-          </p>
-        </a>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

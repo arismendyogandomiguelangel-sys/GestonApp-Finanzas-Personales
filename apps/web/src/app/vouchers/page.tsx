@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { ModuleHeaderIHA } from "@/ui/agent/ModuleHeaderIHA";
+import styles from "./vouchers.module.css";
 
 export default function VouchersCapturePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -12,6 +15,7 @@ export default function VouchersCapturePage() {
     total: number;
     itbis: number;
     date: string;
+    category: string;
   } | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,7 +29,7 @@ export default function VouchersCapturePage() {
     if (!selectedFile) return;
     setIsProcessing(true);
 
-    // Simular pipeline OCR multimodal de voucher
+    // Simular pipeline OCR multimodal con Gemini / OpenAI / Cloudinary
     setTimeout(() => {
       setIsProcessing(false);
       setExtractedData({
@@ -35,60 +39,152 @@ export default function VouchersCapturePage() {
         total: 4850.00,
         itbis: 739.83,
         date: "2026-07-25",
+        category: "Gastos Operativos / Suministros",
       });
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div style={{ padding: "24px", maxWidth: "900px", margin: "0 auto", color: "#f8fafc" }}>
-      <div style={{ marginBottom: "24px" }}>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: "700", margin: 0 }}>📸 Captura de Vouchers u OCR</h1>
-        <p style={{ color: "#94a3b8", marginTop: "4px" }}>
-          Sube la foto de tu recibo para extraer RNC, NCF, ITBIS y monto automáticamente.
-        </p>
-      </div>
-
-      <div style={{ backgroundColor: "#1e293b", border: "1px solid #334155", borderRadius: "12px", padding: "24px", marginBottom: "24px" }}>
-        <input
-          type="file"
-          accept="image/*,.pdf"
-          onChange={handleFileChange}
-          style={{ marginBottom: "16px", color: "#94a3b8" }}
+    <main className="container">
+      <section className="panel">
+        <ModuleHeaderIHA
+          title="📸 Captura Inteligente OCR & Vouchers DGII"
+          categoryCode="B"
+          categoryLabel="Registro Financiero Diario · OCR multicanal"
+          description="Sube o fotografía comprobantes y facturas. El motor Gemini/OpenAI extrae automáticamente RNC, NCF, ITBIS y monto total, guardando en Cloudinary para preparar tus formatos 606 y 607."
+          agentContextLabel="OCR Activo · Listo para exportación DGII"
         />
 
-        {selectedFile && (
-          <button
-            onClick={handleProcessOcr}
-            disabled={isProcessing}
-            style={{
-              backgroundColor: "#6366f1",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "10px 20px",
-              fontWeight: "600",
-              cursor: "pointer",
-              display: "block",
-            }}
-          >
-            {isProcessing ? "Procesando OCR con IA..." : "Extraer Datos del Voucher"}
-          </button>
-        )}
-      </div>
+        {/* Indicadores de Comprobantes del Mes */}
+        <div className={styles.metricsRow} style={{ marginBlockEnd: "32px" }}>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={styles.metricLabel}>ITBIS Compras (606)</span>
+              <span className={styles.metricIcon}>🧾</span>
+            </div>
+            <p className={styles.metricValue}>RD$ 18,450.00</p>
+            <div className={styles.metricSub}>
+              <span>14 comprobantes procesados con NCF</span>
+            </div>
+          </div>
 
-      {extractedData && (
-        <div style={{ backgroundColor: "#0f172a", border: "1px solid #10b981", borderRadius: "12px", padding: "20px" }}>
-          <h3 style={{ margin: "0 0 16px", color: "#10b981", fontSize: "1.1rem" }}>✅ Voucher Procesado con Éxito</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "0.95rem" }}>
-            <div><strong>Emisor:</strong> {extractedData.issuer}</div>
-            <div><strong>RNC:</strong> {extractedData.rnc}</div>
-            <div><strong>NCF:</strong> {extractedData.ncf}</div>
-            <div><strong>Fecha:</strong> {extractedData.date}</div>
-            <div><strong>Monto Total:</strong> RD$ {extractedData.total.toFixed(2)}</div>
-            <div><strong>ITBIS (18%):</strong> RD$ {extractedData.itbis.toFixed(2)}</div>
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={styles.metricLabel}>NCF de Ventas (607)</span>
+              <span className={styles.metricIcon}>🏷️</span>
+            </div>
+            <p className={styles.metricValue}>RD$ 165,600.00</p>
+            <div className={styles.metricSub}>
+              <span>Iguala Fija + Tienda Online + Honorarios</span>
+            </div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <div className={styles.metricHeader}>
+              <span className={styles.metricLabel}>Almacenamiento Cloudinary</span>
+              <span className={styles.metricIcon}>☁️</span>
+            </div>
+            <p className={styles.metricValue}>100% Protegido</p>
+            <div className={styles.metricSub}>
+              <span>Enlaces permanentes de respaldo</span>
+            </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Dropzone OCR de Vouchers */}
+        <div className={styles.dropzoneBox}>
+          <div className={styles.dropIconBox}>📑</div>
+          <h2 className={styles.dropTitle}>
+            {selectedFile ? `Archivo listo: ${selectedFile.name}` : "Arrastra tu factura o haz clic para subir"}
+          </h2>
+          <p className={styles.dropSub}>
+            Compatible con fotos (JPG, PNG) y PDF de facturas con NCF. Axelin identificará automáticamente el RNC y calculará el 18% o tasa aplicable.
+          </p>
+
+          <label style={{ cursor: "pointer", marginBlockStart: "8px" }}>
+            <span className={styles.ocrButton}>
+              {selectedFile ? "Cambiar archivo" : "Seleccionar Comprobante / Voucher"}
+            </span>
+            <input
+              type="file"
+              accept="image/*,.pdf"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+          </label>
+
+          {selectedFile && !extractedData && (
+            <button
+              onClick={handleProcessOcr}
+              disabled={isProcessing}
+              className={styles.ocrButton}
+              style={{ marginBlockStart: "12px", background: "var(--agent-gradient)" }}
+            >
+              {isProcessing ? "🧠 Analizando con Gemini/OpenAI OCR..." : "✨ Extraer Datos del Voucher"}
+            </button>
+          )}
+        </div>
+
+        {/* Tarjeta de Datos Extraídos */}
+        {extractedData && (
+          <div className={styles.resultPanel} style={{ marginBlockStart: "32px" }}>
+            <div className={styles.resultHeader}>
+              <h3 className={styles.resultTitle}>
+                <span>✨ Voucher Procesado y Validado</span>
+              </h3>
+              <span className={styles.dgiiTag}>
+                🏛️ Listo para Formato 606 DGII
+              </span>
+            </div>
+
+            <div className={styles.dataGrid}>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>Emisor del Comprobante</span>
+                <span className={styles.dataValue}>{extractedData.issuer}</span>
+              </div>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>RNC Verificado</span>
+                <span className={styles.dataValue}>{extractedData.rnc}</span>
+              </div>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>NCF (Crédito Fiscal)</span>
+                <span className={styles.dataValue}>{extractedData.ncf}</span>
+              </div>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>Fecha de Emisión</span>
+                <span className={styles.dataValue}>{extractedData.date}</span>
+              </div>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>ITBIS Facturado (18%)</span>
+                <span className={styles.dataValue} style={{ color: "var(--warning)" }}>
+                  RD$ {extractedData.itbis.toFixed(2)}
+                </span>
+              </div>
+              <div className={styles.dataItem}>
+                <span className={styles.dataLabel}>Monto Total</span>
+                <span className={styles.dataValue} style={{ color: "var(--success)" }}>
+                  RD$ {extractedData.total.toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.actionRow}>
+              <button
+                className={styles.btnSecondary}
+                onClick={() => {
+                  setSelectedFile(null);
+                  setExtractedData(null);
+                }}
+              >
+                Escanear otro voucher
+              </button>
+              <Link href="/transactions" className={styles.ocrButton} style={{ textDecoration: "none" }}>
+                Confirmar y Registrar Gasto →
+              </Link>
+            </div>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

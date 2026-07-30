@@ -1,39 +1,102 @@
 :root {
-  --bg: #f5f7fb;
-  --bg-subtle: #eef2ff;
-  --panel: #ffffff;
-  --panel-raised: #ffffff;
-  --panel-border: #e2e8f0;
-  --text: #172033;
-  --muted: #64748b;
-  --accent: #5b4fe9;
-  --accent-strong: #4338ca;
-  --accent-soft: #eeecff;
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+  /* HSL Color System - Light Theme (UI/UX Pro Max & Google Stitch style) */
+  --bg-hsl: 224, 35%, 97%;
+  --bg: hsl(224, 35%, 97%);
+  --bg-subtle: hsl(226, 70%, 96%);
+  --bg-gradient: linear-gradient(135deg, hsl(224, 35%, 97%) 0%, hsl(228, 55%, 94%) 100%);
+  
+  --panel: hsl(0, 0%, 100%);
+  --panel-raised: hsl(0, 0%, 100%);
+  --panel-glass: hsla(0, 0%, 100%, 0.85);
+  --panel-hover: hsl(226, 60%, 98%);
+  --panel-border: hsl(220, 25%, 88%);
+  --border-subtle: hsl(220, 25%, 92%);
+  --border-glow: hsla(245, 82%, 63%, 0.35);
+
+  --text: hsl(222, 45%, 13%);
+  --text-secondary: hsl(218, 22%, 36%);
+  --muted: hsl(215, 18%, 52%);
+
+  /* Primary Accent - Vibrant HSL Purple/Indigo */
+  --accent: hsl(245, 82%, 63%);
+  --accent-strong: hsl(245, 85%, 52%);
+  --accent-soft: hsl(245, 85%, 95%);
+  --accent-gradient: linear-gradient(135deg, hsl(245, 82%, 63%) 0%, hsl(268, 85%, 60%) 100%);
+  --accent-glow: hsla(245, 82%, 63%, 0.28);
+
+  /* Axelin / ALIAS Agent Theme Tokens */
+  --agent-accent: hsl(265, 89%, 66%);
+  --agent-accent-soft: hsla(265, 89%, 66%, 0.12);
+  --agent-gradient: linear-gradient(135deg, hsl(252, 92%, 64%) 0%, hsl(190, 90%, 50%) 100%);
+  --agent-glow: hsla(252, 92%, 64%, 0.35);
+
+  /* Functional Status Colors */
+  --success: hsl(158, 72%, 36%);
+  --success-soft: hsl(158, 68%, 93%);
+  --warning: hsl(38, 92%, 50%);
+  --warning-soft: hsl(42, 90%, 93%);
+  --danger: hsl(0, 84%, 60%);
+  --danger-soft: hsl(0, 85%, 94%);
+
+  /* Premium Depth Shadows */
+  --shadow-sm: 0 2px 4px hsla(222, 35%, 15%, 0.05);
+  --shadow-md: 0 8px 24px hsla(222, 35%, 15%, 0.08);
+  --shadow-lg: 0 20px 48px hsla(222, 35%, 15%, 0.12);
+  --shadow-floating: 0 24px 60px hsla(222, 45%, 15%, 0.18), 0 0 0 1px hsla(220, 25%, 88%, 0.8);
+  --shadow-glow: 0 0 24px var(--accent-glow);
+
+  /* Radii */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Interaction */
   --cursor-pointer: pointer;
+  --transition-smooth: 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --backdrop-blur: blur(16px);
 }
 
 [data-theme="dark"] {
-  --bg: #0b1220;
-  --bg-subtle: #111b31;
-  --panel: #111b2e;
-  --panel-raised: #17233a;
-  --panel-border: #2a3a54;
-  --text: #e7edf8;
-  --muted: #9caec8;
-  --accent: #8b82ff;
-  --accent-strong: #b2acff;
-  --accent-soft: #25234d;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #fb7185;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 14px 36px rgba(0, 0, 0, 0.3);
+  --bg-hsl: 222, 47%, 7%;
+  --bg: hsl(222, 47%, 7%);
+  --bg-subtle: hsl(222, 40%, 11%);
+  --bg-gradient: linear-gradient(135deg, hsl(222, 47%, 7%) 0%, hsl(224, 50%, 10%) 100%);
+
+  --panel: hsl(222, 40%, 11%);
+  --panel-raised: hsl(222, 38%, 14%);
+  --panel-glass: hsla(222, 40%, 12%, 0.86);
+  --panel-hover: hsl(222, 38%, 17%);
+  --panel-border: hsl(222, 30%, 20%);
+  --border-subtle: hsl(222, 28%, 16%);
+  --border-glow: hsla(245, 86%, 68%, 0.45);
+
+  --text: hsl(220, 65%, 95%);
+  --text-secondary: hsl(218, 30%, 80%);
+  --muted: hsl(215, 22%, 62%);
+
+  --accent: hsl(245, 86%, 68%);
+  --accent-strong: hsl(245, 88%, 76%);
+  --accent-soft: hsla(245, 86%, 68%, 0.16);
+  --accent-gradient: linear-gradient(135deg, hsl(245, 86%, 68%) 0%, hsl(270, 88%, 66%) 100%);
+  --accent-glow: hsla(245, 86%, 68%, 0.35);
+
+  --agent-accent: hsl(265, 92%, 72%);
+  --agent-accent-soft: hsla(265, 92%, 72%, 0.18);
+  --agent-gradient: linear-gradient(135deg, hsl(255, 95%, 70%) 0%, hsl(190, 95%, 58%) 100%);
+  --agent-glow: hsla(255, 95%, 70%, 0.45);
+
+  --success: hsl(158, 68%, 52%);
+  --success-soft: hsla(158, 68%, 52%, 0.16);
+  --warning: hsl(40, 95%, 60%);
+  --warning-soft: hsla(40, 95%, 60%, 0.16);
+  --danger: hsl(355, 88%, 65%);
+  --danger-soft: hsla(355, 88%, 65%, 0.16);
+
+  --shadow-sm: 0 2px 6px hsla(0, 0%, 0%, 0.35);
+  --shadow-md: 0 10px 30px hsla(0, 0%, 0%, 0.45);
+  --shadow-lg: 0 24px 56px hsla(0, 0%, 0%, 0.6);
+  --shadow-floating: 0 28px 70px hsla(0, 0%, 0%, 0.75), 0 0 0 1px hsla(222, 30%, 24%, 0.8);
+  --shadow-glow: 0 0 30px var(--accent-glow);
 }

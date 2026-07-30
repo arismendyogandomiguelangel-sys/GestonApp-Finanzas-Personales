@@ -1,0 +1,125 @@
+.fiscalContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.metricCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-smooth);
+}
+
+.metricCard:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricLabel {
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metricIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.metricValue {
+  font-size: 1.85rem;
+  font-weight: 850;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.metricSub {
+  font-size: 12.5px;
+  color: var(--success);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Nav Cards to Subpages */
+.subnavGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.subnavCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all var(--transition-smooth);
+}
+
+.subnavCard:hover {
+  border-color: var(--accent);
+  background: var(--bg-subtle);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.subnavTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subnavDesc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.calendarBox {
+  background: var(--panel-raised);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: 0 8px 30px var(--agent-glow);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

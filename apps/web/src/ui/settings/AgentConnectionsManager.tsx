@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/cn";
@@ -9,9 +9,6 @@ import type { AgentConnectionRow } from "@/server/agent/connections";
 
 import settingsStyles from "./SettingsForm.module.css";
 
-const MACHINE_API_BASE_URL = "https://api.expense-budget-tracker.com/v1";
-const MACHINE_API_DISCOVERY_URL = `${MACHINE_API_BASE_URL}/`;
-const MACHINE_API_OPENAPI_URL = `${MACHINE_API_BASE_URL}/openapi.json`;
 const COPY_FEEDBACK_MS = 1500;
 
 type AccessCardId = "agent" | "program";
@@ -25,23 +22,23 @@ type AccessCard = Readonly<{
   snippet: string;
 }>;
 
-const ACCESS_CARDS: ReadonlyArray<AccessCard> = [
+const buildAccessCards = (origin: string): ReadonlyArray<AccessCard> => [
   {
     id: "agent",
     titleKey: "agentAccess.agentTitle",
     descriptionKey: "agentAccess.agentDescription",
     linkKey: "agentAccess.discoveryLink",
-    href: MACHINE_API_DISCOVERY_URL,
-    snippet: `Start with GET ${MACHINE_API_DISCOVERY_URL}
-Follow the response instructions for signup, login, and workspace setup.`,
+    href: `${origin}/api/agent`,
+    snippet: `GET ${origin}/api/agent
+Read the discovery response, then follow its sign-in and workspace instructions.`,
   },
   {
     id: "program",
     titleKey: "agentAccess.programTitle",
     descriptionKey: "agentAccess.programDescription",
     linkKey: "agentAccess.openapiLink",
-    href: MACHINE_API_OPENAPI_URL,
-    snippet: `GET ${MACHINE_API_OPENAPI_URL}
+    href: `${origin}/api/agent/schema`,
+    snippet: `GET ${origin}/api/agent/schema
 Authenticated requests use Authorization: ApiKey <key>.`,
   },
 ];
@@ -61,9 +58,12 @@ export const AgentConnectionsManager = (props: Props): ReactElement => {
   const [loadingConnectionId, setLoadingConnectionId] = useState<string | null>(null);
   const [copiedCardId, setCopiedCardId] = useState<AccessCardId | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [origin, setOrigin] = useState<string>("");
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const accessCards = useMemo(() => buildAccessCards(origin), [origin]);
 
   useEffect(() => {
+    setOrigin(window.location.origin);
     return () => {
       if (copyTimerRef.current !== null) {
         clearTimeout(copyTimerRef.current);
@@ -116,7 +116,7 @@ export const AgentConnectionsManager = (props: Props): ReactElement => {
   return (
     <div className={settingsStyles.form}>
       <div className={settingsStyles.accessGrid}>
-        {ACCESS_CARDS.map((card) => (
+        {accessCards.map((card) => (
           <section key={card.id} className={settingsStyles.accessCard}>
             <div className={settingsStyles.rowWide}>
               <h2 className={settingsStyles.accessTitle}>{t(card.titleKey)}</h2>

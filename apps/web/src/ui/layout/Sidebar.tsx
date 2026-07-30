@@ -56,6 +56,13 @@ export function Sidebar() {
     }
   }, []);
 
+  useEffect(() => {
+    document.body.classList.toggle("sidebar-collapsed", collapsed);
+    return () => {
+      document.body.classList.remove("sidebar-collapsed");
+    };
+  }, [collapsed]);
+
   // Close the mobile drawer on navigation.
   useEffect(() => {
     setMobileOpen(false);

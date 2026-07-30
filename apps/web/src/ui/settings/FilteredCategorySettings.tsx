@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactElement, useCallback, useState } from "react";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import { fetchWithCsrf } from "@/lib/csrf";
@@ -93,7 +94,11 @@ export const FilteredCategorySettings = (props: Props): ReactElement => {
             </label>
           ))}
           {allCategories.length === 0 && (
-            <span className={settingsStyles.label}>{t("settings.noCategories")}</span>
+            <div className={settingsStyles.emptyState}>
+              <span className={settingsStyles.label}>{t("settings.noCategories")}</span>
+              <p className={settingsStyles.emptyStateText}>Las categorías aparecen cuando registras tu primera transacción.</p>
+              <Link className={settingsStyles.inlineLink} href="/transactions">Ir a transacciones</Link>
+            </div>
           )}
         </div>
         <div className={settingsStyles.control}>

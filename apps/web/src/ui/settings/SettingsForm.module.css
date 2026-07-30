@@ -267,6 +267,21 @@
   cursor: var(--cursor-pointer);
 }
 
+.emptyState {
+  border: 1px dashed var(--panel-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+}
+
+.emptyStateText {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .accessGrid {
     grid-template-columns: 1fr;
